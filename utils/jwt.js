@@ -1,4 +1,3 @@
-import _ from 'underscore'
 import config from '../config'
 import jsrsasign from 'jsrsasign'
 import uuid from 'node-uuid'

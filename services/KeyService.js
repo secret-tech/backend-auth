@@ -31,7 +31,7 @@ export default {
 
     const token = JWT.generate(user, deviceId, userKey, issuedAt, expiresAt)
     const key = sessionKey(user.id, deviceId, issuedAt)
-    console.log(key)
+    
     await this.client.setAsync(key, userKey)
     await this.client.expireAsync(key, EXPIRATION_TIME)
 
