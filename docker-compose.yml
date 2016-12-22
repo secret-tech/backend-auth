@@ -1,0 +1,18 @@
+version: '2'
+services:
+
+  auth:
+    build: ./
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+        - "3000:3000"
+    volumes:
+      - /usr/src/app/node_modules
+      - ./:/usr/src/app
+    links:
+      - redis
+
+  redis:
+    image: redis:latest
