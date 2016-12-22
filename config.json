@@ -1,6 +1,6 @@
 {
 	"key_service": {
-		"expires_seconds": 604800,
+		"expires_seconds": 604800
 	},
 	"jwt": {
 		"algorithm": "HS256",
