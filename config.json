@@ -1,0 +1,12 @@
+{
+	"key_service": {
+		"expires_seconds": 604800,
+		"port": 6379,
+		"host": "127.0.0.1"
+	},
+	"jwt": {
+		"algorithm": "HS256",
+		"secret_separator": ":",
+		"secret": "uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r"
+	}
+}
