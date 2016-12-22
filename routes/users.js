@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt-nodejs');
 var redis = require('redis');
-var redisClient = redis.createClient(6379, '127.0.0.1');
+var redisClient = redis.createClient(6379, 'redis');
 var uuid = require('node-uuid');
 var _ = require('underscore');
 
-/** 
+/**
  * POST create user
  *
  * TODO: check if this route were called only
@@ -14,7 +14,7 @@ var _ = require('underscore');
  *
  * Create new user in Redis storage
  * Throw an error if user already exists in DB
- * 
+ *
  * @param  {[type]} req   [description]
  * @param  {[type]} res   [description]
  * @param  {[type]} next) {}          [description]
