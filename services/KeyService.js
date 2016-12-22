@@ -5,7 +5,7 @@ config.file('config.json');
 var uuid = require('node-uuid');
 var JWT = require('../utils/jwt');
 var bcrypt = require('bcrypt-nodejs');
-var EXPIRATION_TIME = config.get('key_service:expires_seconds');
+var EXPIRATION_TIME = config.get( 'key_service:expires_seconds');
 
 var sessionKey = function(userId, deviceId, issuedAt) {
   return userId + deviceId + issuedAt;
@@ -14,8 +14,8 @@ var sessionKey = function(userId, deviceId, issuedAt) {
 Promise.promisifyAll(redis.RedisClient.prototype);
 
 function KeyService() {
-  this.client = redis.createClient(config.get('key_service:port'),
-                                   config.get('key_service:host'));
+  this.client = redis.createClient(config.get('redis:port'),
+                                   config.get('redis:host'));
 }
 
 // Retrieve a JWT user key
