@@ -18,13 +18,13 @@ const router = express.Router()
  * @param  {[type]} next) {}          [description]
  * @return {[type]}       [description]
  */
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
 	const { email, company, password } = req.body
 
 	if (!email || !password) {
 		return res.status(400).send({
 			error: 'email and password are required parameters',
-	    status: 400
+			status: 400
 		})
 	}
 

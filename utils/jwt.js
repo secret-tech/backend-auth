@@ -1,13 +1,12 @@
 import config from '../config'
 import jsrsasign from 'jsrsasign'
-import uuid from 'node-uuid'
 
 const {
   jwt: { algorithm: JWT_ENCODING_ALGORITHM, secret_separator: JWT_SECRET_SEPARATOR, secret }
 } = config
 
 export default {
-  secret,
+  secretKey: secret,
 
   generate(user, deviceId, userKey, issuedAt, expiresAt) {
     if (!user.id || !user.login) {
@@ -42,8 +41,8 @@ export default {
   verify(token, userKey) {
     const secret = this.secret(userKey);
     const verificationOpts = {
-    	alg: [JWT_ENCODING_ALGORITHM],
-    	verifyAt: new Date().getTime()
+      alg: [JWT_ENCODING_ALGORITHM],
+      verifyAt: new Date().getTime()
     }
     const isValid = jsrsasign.jws.JWS.verifyJWT(token, secret, verificationOpts);
 

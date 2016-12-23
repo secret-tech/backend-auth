@@ -1,6 +1,5 @@
 import redis from 'redis'
 import Promise from 'bluebird'
-import bcrypt from 'bcrypt-nodejs'
 
 import config from '../config'
 import uuid from 'node-uuid'
@@ -31,7 +30,7 @@ export default {
 
     const token = JWT.generate(user, deviceId, userKey, issuedAt, expiresAt)
     const key = sessionKey(user.id, deviceId, issuedAt)
-    
+
     await this.client.setAsync(key, userKey)
     await this.client.expireAsync(key, EXPIRATION_TIME)
 

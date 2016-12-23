@@ -1,16 +1,10 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import uuid from 'node-uuid'
 import bcrypt from 'bcrypt-nodejs'
-import Promise from 'bluebird'
-import redis from 'redis'
 
-import config from '../config'
 import JWT from '../utils/jwt'
 import KeyService from '../services/KeyService'
 import UserService from '../services/UserService'
-
-const { key_service: { expires_seconds: EXPIRATION_TIME }} = config
 
 const router = express.Router()
 /**
@@ -26,7 +20,7 @@ router.post('/', async (req, res, next) => {
 
     if (!login || !password || !deviceId) {
       return res.status(400).send({
-    		error: 'login, password and deviceId are required parameters',
+        error: 'login, password and deviceId are required parameters',
         status: 400
       })
     }
@@ -42,7 +36,7 @@ router.post('/', async (req, res, next) => {
 
     const user = JSON.parse(userStr)
     const passwordMatch = bcrypt.compareSync(password, user.password)
-    
+
     if(!passwordMatch) {
       return res.status(403).send({
         error: 'Incorrect password',
@@ -57,7 +51,6 @@ router.post('/', async (req, res, next) => {
     })
 
   } catch(e) {
-    console.log(e)
     next(e)
   }
 })
@@ -86,8 +79,7 @@ router.delete('/:sessionKey', async (req, res, next) => {
     return result ? res.status(204).send() : res.status(404).send()
 
   } catch(e) {
-    console.log(error)
-    next(error)
+    next(e)
   }
 })
 
@@ -100,7 +92,7 @@ router.delete('/:sessionKey', async (req, res, next) => {
  * @param  {[type]} next) {	var        token [description]
  * @return {[type]}       [description]
  */
-router.post('/verify', (req, res, next) => {
+router.post('/verify', (req, res) => {
 	const { token } = req.body
 	const decoded = jwt.decode(token)
 
