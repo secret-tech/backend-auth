@@ -1,37 +1,39 @@
-var redis = require('redis');
-var Promise = require('bluebird');
-var config = require('nconf');
-config.file('config.json');
-var uuid = require('node-uuid');
-var _ = require('underscore');
+import redis from 'redis'
+import Promise from 'bluebird'
+import uuid from 'node-uuid'
+import bcrypt from 'bcrypt-nodejs'
 
-Promise.promisifyAll(redis.RedisClient.prototype);
+import config from '../config'
 
-function UserService() {
-  this.client = redis.createClient(config.get('redis:port'),
-                                   config.get('redis:host'));
-}
+const { redis: { port, host } } = config
+const client = Promise.promisifyAll(redis.createClient(port, host))
 
-// Retrieve a user by it's login
-UserService.prototype.get = function(login) {
-  return this.client.getAsync(login);
-};
+export default {
+  // Redis client
+  client,
 
-UserService.prototype.create = function(userData) {
-	var params = _.pick(userData, 'email', 'company', 'password');
-	if (!params.email || !params.password) {
-		return false;
-	}
-	var password = bcrypt.hashSync(params.password);
-	var createUser = redisClient.setAsync(params.company+':'+params.email, JSON.stringify({
-		id: uuid.v4(),
-		login: params.company + ':' + params.email,
-		password: password,
-		email: params.email,
-		company: params.company,
-	});
-	
-	createUser.then(function(err, response) {
+  // Retrieve a user by it's login
+  get(login) {
+    return this.client.getAsync(login)
+  },
 
-	});
+  // Create new user
+  create(userData) {
+    const { email, company, password } = userData
+
+  	if (!email || !password) {
+  		return false
+  	}
+
+  	const pwd = bcrypt.hashSync(password)
+    const login = `${company}:${email}`
+
+  	return this.client.setAsync(login, JSON.stringify({
+  		id: uuid.v4(),
+  		login,
+  		password: pwd,
+  		email,
+  		company
+  	}))
+  }
 }

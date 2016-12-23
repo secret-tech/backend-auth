@@ -1,50 +1,45 @@
-var redis = require('redis');
-var Promise = require('bluebird');
-var config = require('nconf');
-config.file('config.json');
-var uuid = require('node-uuid');
-var JWT = require('../utils/jwt');
-var bcrypt = require('bcrypt-nodejs');
-var EXPIRATION_TIME = config.get( 'key_service:expires_seconds');
+import redis from 'redis'
+import Promise from 'bluebird'
+import bcrypt from 'bcrypt-nodejs'
 
-var sessionKey = function(userId, deviceId, issuedAt) {
-  return userId + deviceId + issuedAt;
-};
+import config from '../config'
+import uuid from 'node-uuid'
+import JWT from '../utils/jwt'
 
-Promise.promisifyAll(redis.RedisClient.prototype);
+const {
+  redis: { port, host },
+  key_service: { expires_seconds: EXPIRATION_TIME }
+} = config
 
-function KeyService() {
-  this.client = redis.createClient(config.get('redis:port'),
-                                   config.get('redis:host'));
+const client = Promise.promisifyAll(redis.createClient(port, host))
+const sessionKey = (userId, deviceId, issuedAt) => userId + deviceId + issuedAt
+
+export default {
+  // Redis client
+  client,
+
+  // Retrieve a JWT user key
+  get(sessionKey) {
+    return this.client.getAsync(sessionKey)
+  },
+
+  // Generate and store a new JWT user key
+  async set(user, deviceId) {
+    const userKey = uuid.v4()
+    const issuedAt = new Date().getTime()
+    const expiresAt = issuedAt + (EXPIRATION_TIME * 1000)
+
+    const token = JWT.generate(user, deviceId, userKey, issuedAt, expiresAt)
+    const key = sessionKey(user.id, deviceId, issuedAt)
+    
+    await this.client.setAsync(key, userKey)
+    await this.client.expireAsync(key, EXPIRATION_TIME)
+
+    return token
+  },
+
+  // Manually remove a JWT user key
+  delete(sessionKey) {
+    return this.client.delAsync(sessionKey)
+  }
 }
-
-// Retrieve a JWT user key
-KeyService.prototype.get = function(sessionKey) {
-  return this.client.getAsync(sessionKey);
-};
-
-// Generate and store a new JWT user key
-KeyService.prototype.set = function(user, deviceId) {
-  var userKey = uuid.v4();
-  var issuedAt = new Date().getTime();
-  var expiresAt = issuedAt + (EXPIRATION_TIME * 1000);
-
-  var token = JWT.generate(user, deviceId, userKey, issuedAt, expiresAt);
-  var key = sessionKey(user.id, deviceId, issuedAt);
-
-  var setKey = this.client.setAsync(key, userKey);
-  var setExpiration = setKey.then(this.client.expireAsync(key,
-                                  EXPIRATION_TIME));
-  var getToken = setExpiration.then(function() {
-    return token;
-  });
-
-  return getToken;
-};
-
-// Manually remove a JWT user key
-KeyService.prototype.delete = function(sessionKey) {
-  return this.client.delAsync(sessionKey);
-};
-
-module.exports = new KeyService();

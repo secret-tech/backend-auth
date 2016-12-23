@@ -1,19 +1,18 @@
-var express = require('express');
-var router = express.Router();
-var jwt = require('jsonwebtoken');
-var JWT = require('../utils/jwt');
-var uuid = require('node-uuid');
-var _ = require('underscore');
-var bcrypt = require('bcrypt-nodejs');
-var Promise = require('bluebird');
-var KeyService = require('../services/KeyService');
+import express from 'express'
+import jwt from 'jsonwebtoken'
+import uuid from 'node-uuid'
+import bcrypt from 'bcrypt-nodejs'
+import Promise from 'bluebird'
+import redis from 'redis'
 
-var config = require('nconf');
-config.file('config.json');
-var EXPIRATION_TIME = config.get('jwt:expiration');
-var redis = require('redis');
-var redisClient = redis.createClient(config.get("redis:port"), config.get("redis:host"));
+import config from '../config'
+import JWT from '../utils/jwt'
+import KeyService from '../services/KeyService'
+import UserService from '../services/UserService'
 
+const { key_service: { expires_seconds: EXPIRATION_TIME }} = config
+
+const router = express.Router()
 /**
  * POST login
  * @param  {[type]} req   [description]
@@ -21,107 +20,92 @@ var redisClient = redis.createClient(config.get("redis:port"), config.get("redis
  * @param  {[type]} next) {             var params [description]
  * @return {[type]}       [description]
  */
-router.post('/', function(req, res, next) {
-  var params = _.pick(req.body, 'login', 'password', 'deviceId');
-  if (!params.login || !params.password || !params.deviceId) {
-    return res.status(400).send(
-    	{
-    		error: 'login, password and deviceId' +
-                                'are required parameters',
-            status: 400
-        }
-    );
-  }
+router.post('/', async (req, res, next) => {
+  try {
+    const { login, password, deviceId } = req.body
 
-  var user = new Promise(function(resolve, reject) {
-  		redisClient.get(params.login, function(err, response) {
-  			if (err) {
-  				reject(err);
-  			} else {
-  				resolve(JSON.parse(response));
-  			}
-  		});
-  });
-
-  var passwordMatch = user.then(function(userResult) {
-    if (_.isNull(userResult)) {
-      return res.status(404).send({
-      	error: 'User does not exist',
-      	status: 404
-      });
+    if (!login || !password || !deviceId) {
+      return res.status(400).send({
+    		error: 'login, password and deviceId are required parameters',
+        status: 400
+      })
     }
-    return bcrypt.compareSync(params.password, userResult.password);
-  });
 
-  Promise.join(user, passwordMatch, function(userResult, passwordMatchResult) {
-    if (!passwordMatchResult) {
+    const userStr = await UserService.get(login)
+
+    if (!userStr) {
+      return res.status(404).send({
+        error: 'User does not exist',
+        status: 404
+      })
+    }
+
+    const user = JSON.parse(userStr)
+    const passwordMatch = bcrypt.compareSync(password, user.password)
+    
+    if(!passwordMatch) {
       return res.status(403).send({
         error: 'Incorrect password',
         status: 403
-      });
+      })
     }
 
-	  var userKey = uuid.v4();
-	  var issuedAt = new Date().getTime();
-	  var expiresAt = issuedAt + (EXPIRATION_TIME * 1000);
+    const token = await KeyService.set(user, deviceId)
 
-	  var token = JWT.generate(userResult, issuedAt, expiresAt);
+    res.status(200).send({
+      accessToken: token
+    })
 
-	  return KeyService.set(userResult, params.deviceId)
-        .then(function(token) {
-          res.status(200).send({
-            accessToken: token
-          });
-        });
-  })
-    .catch(function(error) {
-      console.log(error);
-      next(error);
-    });
-});
+  } catch(e) {
+    console.log(e)
+    next(e)
+  }
+})
 
 /**
  * DELETE
  * Perform logout action
- * 
+ *
  * @param  {[type]} req   [description]
  * @param  {[type]} res   [description]
  * @param  {[type]} next) {             var sessionKey [description]
  * @return {[type]}       [description]
  */
-router.delete('/:sessionKey', function(req, res, next) {
-  var sessionKey = req.params.sessionKey;
-  if (!sessionKey) {
-    return res.status(400).send({error: 'sessionKey is a required parameter'});
-  }
+router.delete('/:sessionKey', async (req, res, next) => {
+  try {
+    const { sessionKey }  = req.params
 
-  KeyService.delete(sessionKey)
-    .then(function(result) {
-      if (!result) {
-        return res.status(404).send();
-      }
-      res.status(204).send();
-    })
-    .catch(function(error) {
-      console.log(error);
-      next(error);
-    });
-});
+    if (!sessionKey) {
+      return res.status(400).send({
+        error: 'sessionKey is a required parameter'
+      })
+    }
+
+    const result = await KeyService.delete(sessionKey)
+
+    return result ? res.status(204).send() : res.status(404).send()
+
+  } catch(e) {
+    console.log(error)
+    next(error)
+  }
+})
 
 /**
- * POST 
+ * POST
  * Verify token
- * 
+ *
  * @param  {[type]} req   [description]
  * @param  {[type]} res   [description]
  * @param  {[type]} next) {	var        token [description]
  * @return {[type]}       [description]
  */
-router.post('/verify', function(req, res, next) {
-	var token = req.body.token;
-	var decoded = jwt.decode(token);
-	res.send(JWT.verify(token, decoded.jti));
+router.post('/verify', (req, res, next) => {
+	const { token } = req.body
+	const decoded = jwt.decode(token)
+
+	res.send(JWT.verify(token, decoded.jti))
 });
 
 
-module.exports = router;
+export default router
