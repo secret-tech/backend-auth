@@ -28,8 +28,8 @@ export default {
     const issuedAt = new Date().getTime()
     const expiresAt = issuedAt + (EXPIRATION_TIME * 1000)
 
-    const token = JWT.generate(user, deviceId, userKey, issuedAt, expiresAt)
     const key = sessionKey(user.id, deviceId, issuedAt)
+    const token = JWT.generate(user, deviceId, key, userKey, issuedAt, expiresAt)
 
     await this.client.setAsync(key, userKey)
     await this.client.expireAsync(key, EXPIRATION_TIME)

@@ -92,11 +92,17 @@ router.delete('/:sessionKey', async (req, res, next) => {
  * @param  {[type]} next) {	var        token [description]
  * @return {[type]}       [description]
  */
-router.post('/verify', (req, res) => {
+router.post('/verify', async (req, res) => {
 	const { token } = req.body
 	const decoded = jwt.decode(token)
 
-	res.send(JWT.verify(token, decoded.jti))
+  if(!decoded) {
+    return res.status(400).send({
+      error: 'invalid token'
+    })
+  }
+  const isValid = await JWT.verify(token, decoded.jti)
+	res.send(isValid)
 });
 
 
