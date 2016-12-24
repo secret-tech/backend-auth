@@ -31,8 +31,7 @@ router.get('/:sessionKey', async (req, res, next) => {
       : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.'})
 
   } catch(e) {
-    console.log(error)
-    next(error)
+    next(e)
   }
 });
 

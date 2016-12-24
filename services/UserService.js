@@ -21,19 +21,19 @@ export default {
   create(userData) {
     const { email, company, password } = userData
 
-  	if (!email || !password) {
-  		return false
-  	}
+    if (!email || !password) {
+      return false
+    }
 
-  	const pwd = bcrypt.hashSync(password)
+    const pwd = bcrypt.hashSync(password)
     const login = `${company}:${email}`
 
-  	return this.client.setAsync(login, JSON.stringify({
-  		id: uuid.v4(),
-  		login,
-  		password: pwd,
-  		email,
-  		company
-  	}))
+    return this.client.setAsync(login, JSON.stringify({
+      id: uuid.v4(),
+      login,
+      password: pwd,
+      email,
+      company
+    }))
   }
 }
