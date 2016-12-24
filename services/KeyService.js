@@ -13,7 +13,7 @@ const {
 const client = Promise.promisifyAll(redis.createClient(port, host))
 const sessionKey = (userId, deviceId, issuedAt) => userId + deviceId + issuedAt
 
-export default {
+const KeyService = {
   // Redis client
   client,
 
@@ -42,3 +42,5 @@ export default {
     return this.client.delAsync(sessionKey)
   }
 }
+
+export default KeyService

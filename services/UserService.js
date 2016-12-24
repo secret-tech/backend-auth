@@ -8,7 +8,7 @@ import config from '../config'
 const { redis: { port, host } } = config
 const client = Promise.promisifyAll(redis.createClient(port, host))
 
-export default {
+const UserService = {
   // Redis client
   client,
 
@@ -37,3 +37,5 @@ export default {
     }))
   }
 }
+
+export default UserService
