@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon ./bin/www --exec babel-node --presets es2015,stage-0",
     "lint": "esw ./ --color",
-    "test": "mocha \"./{,!(node_modules)/**/}*.spec.js\" --require babel-polyfill --compilers js:babel-register --reporter progress"
+    "test": "nyc mocha \"./{,!(node_modules)/**/}*.spec.js\""
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -37,7 +37,9 @@
     "eslint": "3.12.2",
     "eslint-plugin-import": "2.2.0",
     "eslint-watch": "2.1.14",
+    "istanbul": "0.4.5",
     "mocha": "3.2.0",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "nyc": "10.0.0"
   }
 }
