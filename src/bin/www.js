@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+import 'babel-core/register'
+import 'babel-polyfill'
 /**
  * Module dependencies.
  */
