@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www --exec babel-node --presets es2015,stage-0",
-    "lint": "esw ./ --color",
-    "test": "nyc mocha \"./{,!(node_modules)/**/}*.spec.js\""
+    "start": "nodemon ./src/bin/www --exec babel-node",
+    "serve": "node ./dist/bin/www",
+    "lint": "esw ./src --color",
+    "test": "nyc mocha ./src/**/*.spec.js",
+    "build": "babel src -d dist"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
