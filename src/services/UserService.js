@@ -14,7 +14,7 @@ const UserService = {
 
   // Retrieve a user by it's login
   get(login) {
-    return this.client.getAsync(login)
+    return client.getAsync(login)
   },
 
   // Create new user
@@ -22,13 +22,13 @@ const UserService = {
     const { email, company, password } = userData
 
     if (!email || !password) {
-      return false
+      throw new Error('email and password are required parameters')
     }
 
     const pwd = bcrypt.hashSync(password)
     const login = `${company}:${email}`
 
-    return this.client.setAsync(login, JSON.stringify({
+    return client.setAsync(login, JSON.stringify({
       id: uuid.v4(),
       login,
       password: pwd,

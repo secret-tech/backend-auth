@@ -1,5 +1,4 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt-nodejs'
 
 import JWT from '../utils/jwt'
@@ -49,7 +48,6 @@ router.post('/', async (req, res, next) => {
     res.status(200).send({
       accessToken: token
     })
-
   } catch(e) {
     next(e)
   }
@@ -76,8 +74,9 @@ router.delete('/:sessionKey', async (req, res, next) => {
 
     const result = await KeyService.delete(sessionKey)
 
-    return result ? res.status(204).send() : res.status(404).send()
-
+    return result
+      ? res.status(204).send()
+      : res.status(404).send()
   } catch(e) {
     next(e)
   }
@@ -94,14 +93,14 @@ router.delete('/:sessionKey', async (req, res, next) => {
  */
 router.post('/verify', async (req, res) => {
 	const { token } = req.body
-	const decoded = jwt.decode(token)
+  const isValid = await JWT.verify(token)
 
-  if(!decoded) {
+  if(!isValid) {
     return res.status(400).send({
       error: 'invalid token'
     })
   }
-  const isValid = await JWT.verify(token, decoded.jti)
+
 	res.send(isValid)
 });
 

@@ -29,6 +29,7 @@ router.post('/', async (req, res) => {
 	}
 
 	const result = await UserService.create({ email, password, company })
+
 	res.json(result)
 })
 

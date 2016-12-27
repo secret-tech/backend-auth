@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable */
 import 'babel-core/register'
 import 'babel-polyfill'
 /**

@@ -1,5 +1,5 @@
 import config from '../config'
-import jsrsasign from 'jsrsasign'
+import jwt from 'jsonwebtoken'
 import KeyService from '../services/KeyService'
 
 const {
@@ -9,29 +9,21 @@ const {
 export default {
   secretKey: secret,
 
-  generate(user, deviceId, sessionKey, userKey, issuedAt, expiresAt) {
+  generate(user, deviceId, sessionKey, userKey, issuedAt, expiresIn) {
     if (!user.id || !user.login) {
       throw new Error('user.id and user.login are required parameters');
-    }
-
-    const header = {
-      alg: JWT_ENCODING_ALGORITHM,
-      typ: 'JWT'
     }
 
     const payload = {
       login: user.login,
       deviceId,
       jti: sessionKey,
-      iat: issuedAt,
-      exp: expiresAt
+      iat: issuedAt
     }
 
     const secret = this.secret(userKey)
-    const token = jsrsasign.jws.JWS.sign(JWT_ENCODING_ALGORITHM,
-                           JSON.stringify(header),
-                           JSON.stringify(payload),
-                           secret)
+    const token = jwt.sign(payload, secret, {algorithm: JWT_ENCODING_ALGORITHM, expiresIn})
+
     return token
   },
 
@@ -39,15 +31,21 @@ export default {
     return this.secretKey + JWT_SECRET_SEPARATOR + userKey
   },
 
-  async verify(token, sessionKey) {
-    const userKey = await KeyService.get(sessionKey)
-    const secret = this.secret(userKey);
-    const verificationOpts = {
-      alg: [JWT_ENCODING_ALGORITHM],
-      verifyAt: new Date().getTime()
-    }
-    const isValid = jsrsasign.jws.JWS.verifyJWT(token, secret, verificationOpts);
+  async verify(token) {
+    const decoded = jwt.decode(token)
 
-    return isValid;
+    if(!decoded){
+      return false
+    }
+
+    const userKey = await KeyService.get(decoded.jti)
+    const secret = this.secret(userKey)
+
+    try {
+      jwt.verify(token, secret, {algorithms: [JWT_ENCODING_ALGORITHM]})
+      return true
+    } catch(e) {
+      return false
+    }
   }
 }
