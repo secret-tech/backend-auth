@@ -1,8 +1,8 @@
 import redis from 'redis'
 import Promise from 'bluebird'
+import uuid from 'node-uuid'
 
 import config from '../config'
-import uuid from 'node-uuid'
 import JWT from '../utils/jwt'
 
 const {
@@ -25,21 +25,20 @@ const KeyService = {
   // Generate and store a new JWT user key
   async set(user, deviceId) {
     const userKey = uuid.v4()
-    const issuedAt = new Date().getTime()
-    const expiresAt = issuedAt + (EXPIRATION_TIME * 1000)
+    const issuedAt = Date.now()
 
     const key = sessionKey(user.id, deviceId, issuedAt)
-    const token = JWT.generate(user, deviceId, key, userKey, issuedAt, expiresAt)
+    const token = JWT.generate(user, deviceId, key, userKey, issuedAt, EXPIRATION_TIME)
 
-    await this.client.setAsync(key, userKey)
-    await this.client.expireAsync(key, EXPIRATION_TIME)
+    await client.setAsync(key, userKey)
+    await client.expireAsync(key, EXPIRATION_TIME)
 
     return token
   },
 
   // Manually remove a JWT user key
   delete(sessionKey) {
-    return this.client.delAsync(sessionKey)
+    return client.delAsync(sessionKey)
   }
 }
 

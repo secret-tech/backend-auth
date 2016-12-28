@@ -1,6 +1,3 @@
 {
- "presets": ["es2015", "stage-0"],
- "ignore": [
-    "src/**/*.spec.js"
-  ]
+ "presets": ["es2015", "stage-0"]
 }

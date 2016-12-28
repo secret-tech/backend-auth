@@ -2,14 +2,15 @@
   "lines": 80,
   "statements": 80,
   "functions": 80,
-  "branches": 75,
+  "branches": 80,
   "include": [
     "**/*.js"
   ],
   "exclude": [
     "**/*.spec.js",
     "coverage",
-    "*.js"
+    "*.js",
+    "src/*.js"
   ],
   "reporter": [
     "html",

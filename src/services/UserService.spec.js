@@ -13,6 +13,45 @@ describe('UserService', () => {
 
       expect(result).to.equal('OK')
     })
+
+    it('should require an email', async () => {
+      const user = { email: '', company: 'test', password: 'test' }
+      let error = {}
+
+      try {
+        await UserService.create(user)
+      } catch(e) {
+        error = e
+      }
+
+      expect(error.message).to.equal('email and password are required parameters')
+    })
+
+    it('should require an password', async () => {
+      const user = { email: 'test', company: 'test', password: '' }
+      let error = {}
+
+      try {
+        await UserService.create(user)
+      } catch(e) {
+        error = e
+      }
+
+      expect(error.message).to.equal('email and password are required parameters')
+    })
+
+    it('should require password and email', async () => {
+      const user = { email: '', company: 'test', password: '' }
+      let error = {}
+
+      try {
+        await UserService.create(user)
+      } catch(e) {
+        error = e
+      }
+
+      expect(error.message).to.equal('email and password are required parameters')
+    })
   })
 
   describe('#get', () => {
