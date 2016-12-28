@@ -17,6 +17,7 @@ export default {
     }
 
     const payload = {
+      id,
       login,
       scope,
       deviceId,
