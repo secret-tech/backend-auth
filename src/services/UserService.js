@@ -19,7 +19,7 @@ const UserService = {
 
   // Create new user
   create(userData) {
-    const { email, company, password } = userData
+    const { email, company, password, scope } = userData
 
     if (!email || !password) {
       throw new Error('email and password are required parameters')
@@ -33,7 +33,8 @@ const UserService = {
       login,
       password: pwd,
       email,
-      company
+      company,
+      scope
     }))
   }
 }
