@@ -19,7 +19,7 @@ const router = express.Router()
  * @return {[type]}       [description]
  */
 router.post('/', async (req, res) => {
-	const { email, company, password } = req.body
+	const { email, company, password, scope } = req.body
 
 	if (!email || !password) {
 		return res.status(400).send({
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 		})
 	}
 
-	const result = await UserService.create({ email, password, company })
+	const result = await UserService.create({ email, password, company, scope })
 
 	res.json(result)
 })

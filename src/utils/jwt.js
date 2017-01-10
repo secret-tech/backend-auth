@@ -10,12 +10,16 @@ export default {
   secretKey: secret,
 
   generate(user, deviceId, sessionKey, userKey, issuedAt, expiresIn) {
-    if (!user.id || !user.login) {
+    const { id, login, scope } = user
+
+    if (!id || !login) {
       throw new Error('user.id and user.login are required parameters');
     }
 
     const payload = {
-      login: user.login,
+      id,
+      login,
+      scope,
       deviceId,
       jti: sessionKey,
       iat: issuedAt
