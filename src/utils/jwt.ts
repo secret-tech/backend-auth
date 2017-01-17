@@ -2,14 +2,21 @@ import config from '../config'
 import * as jwt from 'jsonwebtoken'
 import KeyService from '../services/KeyService'
 
-const {
-  jwt: { algorithm: JWT_ENCODING_ALGORITHM, secret_separator: JWT_SECRET_SEPARATOR, secret }
-} = config
+const { algorithm, secret_separator, secret } = config.jwt
 
-export default {
-  secretKey: secret,
 
-  generate(user, deviceId, sessionKey, userKey, issuedAt, expiresIn) {
+export class JWTService {
+  private secret: string
+  private algorithm: string
+  private secret_separator: string
+
+  constructor(secret: string, algorithm: string, secret_separator: string) {
+    this.secret = secret
+    this.algorithm = algorithm
+    this.secret_separator = secret_separator
+  }
+
+  generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string{
     const { id, login, scope } = user
 
     if (!id || !login) {
@@ -25,17 +32,13 @@ export default {
       iat: issuedAt
     }
 
-    const secret = this.secret(userKey)
-    const token = jwt.sign(payload, secret, {algorithm: JWT_ENCODING_ALGORITHM, expiresIn})
+    const secret = this.generateSecret(userKey)
+    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
 
     return token
-  },
+  }
 
-  secret(userKey){
-    return this.secretKey + JWT_SECRET_SEPARATOR + userKey
-  },
-
-  async verify(token): Promise<any> {
+  async verify(token: string): Promise<boolean> {
     const decoded = jwt.decode(token)
 
     if(!decoded){
@@ -43,13 +46,19 @@ export default {
     }
 
     const userKey = await KeyService.get(decoded.jti)
-    const secret = this.secret(userKey)
+    const secret = this.generateSecret(userKey)
 
     try {
-      jwt.verify(token, secret, {algorithms: [JWT_ENCODING_ALGORITHM]})
+      jwt.verify(token, secret, {algorithms: [this.algorithm]})
       return true
     } catch(e) {
       return false
     }
   }
+
+  private generateSecret(userKey: string): string{
+    return this.secret + this.secret_separator + userKey
+  }
 }
+
+export default new JWTService(secret, algorithm, secret_separator)

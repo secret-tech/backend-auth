@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./src/bin/www --exec babel-node",
+    "start": "nodemon ./src/bin/www --exec ts-node",
     "lint": "esw ./src --color",
     "test": "nyc mocha ./src/**/*.spec.js",
     "build": "babel src -d dist --ignore \"src/**/*.spec.js\"",
@@ -22,6 +22,7 @@
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
+    "es6-promise": "4.0.5",
     "express": "~4.14.0",
     "express-jwt": "^5.1.0",
     "express-unless": "*",
@@ -33,15 +34,11 @@
     "node-uuid": "^1.4.7",
     "redis": "2.6.3",
     "serve-favicon": "~2.3.0",
+    "typescript": "2.1.5",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
     "@types/node": "7.0.0",
-    "babel-cli": "^6.18.0",
-    "babel-polyfill": "6.20.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-preset-stage-0": "^6.16.0",
-    "babel-register": "6.18.0",
     "chai": "3.5.0",
     "chai-http": "3.0.0",
     "eslint": "3.12.2",
@@ -51,6 +48,7 @@
     "mocha": "3.2.0",
     "nodemon": "^1.11.0",
     "nyc": "10.0.0",
+    "ts-node": "2.0.0",
     "typescript": "2.1.5"
   }
 }

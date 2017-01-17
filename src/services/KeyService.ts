@@ -1,45 +1,44 @@
-import * as redis from 'redis'
-import * as bluebird from 'bluebird'
+import storage, { StorageService } from './StorageService'
+import * as Promise from 'bluebird'
 import * as uuid from 'node-uuid'
 
-import config from '../config'
 import JWT from '../utils/jwt'
+import config from '../config'
 
-const {
-  redis: { port, host },
-  key_service: { expires_seconds: EXPIRATION_TIME }
-} = config
 
-const client: any = bluebird.promisifyAll(redis.createClient(port, host))
-const sessionKey = (userId, deviceId, issuedAt) => userId + deviceId + issuedAt
+const { expires_seconds: EXPIRATION_TIME } = config.key_service
 
-const KeyService = {
-  // Redis client
-  client,
+export class KeyService {
+  client: StorageService
 
-  // Retrieve a JWT user key
-  get(sessionKey) {
-    return this.client.getAsync(sessionKey)
-  },
+  constructor(client: StorageService){
+    this.client = client
+  }
 
-  // Generate and store a new JWT user key
-  async set(user, deviceId) {
+  get(key: string): Promise<string> {
+    return this.client.get(key)
+  }
+
+  async set(user: any, deviceId: string): Promise<string> {
     const userKey = uuid.v4()
     const issuedAt = Date.now()
 
-    const key = sessionKey(user.id, deviceId, issuedAt)
+    const key = this.sessionKey(user.id, deviceId, issuedAt)
     const token = JWT.generate(user, deviceId, key, userKey, issuedAt, EXPIRATION_TIME)
 
-    await client.setAsync(key, userKey)
-    await client.expireAsync(key, EXPIRATION_TIME)
+    await this.client.set(key, userKey)
+    await this.client.expire(key, EXPIRATION_TIME)
 
     return token
-  },
+  }
 
-  // Manually remove a JWT user key
-  delete(sessionKey) {
-    return client.delAsync(sessionKey)
+  delete(key: string): Promise<any> {
+    return this.client.del(key)
+  }
+
+  private sessionKey(userId: string, deviceId: string, issuedAt: number): string {
+    return userId + deviceId + issuedAt.toString()
   }
 }
 
-export default KeyService
+export default new KeyService(storage)

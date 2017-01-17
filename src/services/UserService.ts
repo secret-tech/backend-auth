@@ -1,37 +1,34 @@
-import * as redis from 'redis'
-import * as bluebird from 'bluebird'
+import storage, { StorageService } from './StorageService'
+import * as Promise from 'bluebird'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
 
-import config from '../config'
 
-const { redis: { port, host } } = config
-const client: any = bluebird.promisifyAll(redis.createClient(port, host))
+export class UserService {
+  client: StorageService
 
-const UserService = {
-  // Redis client
-  client,
+  constructor(client: StorageService) {
+    this.client = client
+  }
 
-  // Retrieve a user by it's login
-  get(login) {
-    return client.getAsync(login)
-  },
+  get(login: string): Promise<string> {
+    return this.client.get(login)
+  }
 
-  // Create new user
-  create(userData) {
-    const { email, company, password, scope } = userData
+  create(userData: any): Promise<string> {
+    const { email, company, password: passwordHash, scope } = userData
 
-    if (!email || !password) {
+    if (!email || !passwordHash) {
       throw new Error('email and password are required parameters')
     }
 
-    const pwd = bcrypt.hashSync(password)
-    const login = `${company}:${email}`
+    const password: string = bcrypt.hashSync(passwordHash)
+    const login: string = `${company}:${email}`
 
-    return client.setAsync(login, JSON.stringify({
+    return this.client.set(login, JSON.stringify({
       id: uuid.v4(),
       login,
-      password: pwd,
+      password,
       email,
       company,
       scope
@@ -39,4 +36,4 @@ const UserService = {
   }
 }
 
-export default UserService
+export default new UserService(storage)
