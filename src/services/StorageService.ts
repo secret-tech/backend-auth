@@ -16,11 +16,7 @@ export interface StorageService {
 }
 
 class RedisService implements StorageService {
-  client: RedisClient
-
-  constructor(client: RedisClient) {
-    this.client = client
-  }
+  constructor(public client: RedisClient) {}
 
   set(key: string, value: string): Promise<string> {
     return new Promise((resolve, reject) => {
