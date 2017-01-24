@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import * as Promise from 'bluebird'
 import KeyService from '../services/KeyService'
 
 class SessionController {

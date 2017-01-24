@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import * as Promise from 'bluebird'
 import UserService from '../services/UserService'
 
 class UserController {

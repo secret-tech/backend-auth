@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import * as Promise from 'bluebird'
 import * as bcrypt from 'bcrypt-nodejs'
 
 import JWT from '../utils/jwt'

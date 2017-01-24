@@ -1,5 +1,4 @@
 import storage, { StorageService } from './StorageService'
-import * as Promise from 'bluebird'
 import * as uuid from 'node-uuid'
 
 import JWT from '../utils/jwt'
