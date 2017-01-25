@@ -4,13 +4,13 @@
   "functions": 80,
   "branches": 80,
   "include": [
-    "**/*.js"
+    "**/*.ts"
   ],
   "exclude": [
-    "**/*.spec.js",
+    "**/*.spec.ts",
     "coverage",
-    "*.js",
-    "src/*.js"
+    "*.ts",
+    "src/*.ts"
   ],
   "reporter": [
     "html",
@@ -18,11 +18,10 @@
     "text-summary"
   ],
   "require": [
-    "babel-register",
-    "babel-polyfill"
+    "ts-node/register"
   ],
   "extension": [
-    ".js"
+    ".ts"
   ],
   "cache": false,
   "all": false,

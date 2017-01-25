@@ -1,19 +1,38 @@
-import storage, { StorageService } from './StorageService'
+import storage, { StorageService } from './storage.service'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
 
 
+/**
+ * UserService
+ */
 export class UserService {
-  client: StorageService
 
-  constructor(client: StorageService) {
-    this.client = client
-  }
+  /**
+   * constructor
+   *
+   * @param  client  redis client
+   */
+  constructor(private client: StorageService) {}
 
+
+  /**
+   * Return user's data
+   *
+   * @param  login  user's login (company + email)
+   * @return        promise
+   */
   get(login: string): Promise<string> {
     return this.client.get(login)
   }
 
+
+  /**
+   * Save user's data
+   *
+   * @param  userData  user info
+   * @return           promise   
+   */
   create(userData: any): Promise<string> {
     const { email, company, password: passwordHash, scope } = userData
 

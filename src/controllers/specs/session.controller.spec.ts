@@ -1,17 +1,18 @@
-import chai from 'chai'
-import chaiHTTP from 'chai-http'
-import jwt from 'jsonwebtoken'
-import app from '../app'
-import KeyService from '../services/KeyService'
+import { Response } from 'express'
+import * as chai from 'chai'
+import * as jwt from 'jsonwebtoken'
 
-chai.use(chaiHTTP)
+import app from '../../app'
+import keyService from '../../services/key.service'
+import storageService from '../../services/storage.service'
+
 
 const { expect, request } = chai
 
 describe('Session', () => {
   describe('GET /session/:sessionKey', () => {
     afterEach(async () => {
-      await KeyService.client.flushdb()
+      await storageService.flushdb()
     })
 
     it('should return session', async () => {
@@ -22,19 +23,19 @@ describe('Session', () => {
         email: 'test',
         company: 'test'
       }
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       const sessionKey = jwt.decode(token).jti
       const res = await request(app).get(`/session/${sessionKey}`)
 
-      expect(res.body.userKey).to.exists
+      expect(res.body.userKey).to.exist
     })
 
     it('should return 404', async () => {
-      let res
+      let res: any
 
       try {
         res = await request(app).get('/session/test')
-      } catch(e) {
+      } catch (e) {
         res = e
       }
 

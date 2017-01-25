@@ -1,22 +1,26 @@
-import chai from 'chai'
-import chaiHTTP from 'chai-http'
-import app from '../app'
-import jwt from 'jsonwebtoken'
-import UserService from '../services/UserService'
-import KeyService from '../services/KeyService'
+import { Response } from 'express'
+import * as chai from 'chai'
+import * as jwt from 'jsonwebtoken'
 
-chai.use(chaiHTTP)
+import app from '../../app'
+import userService from '../../services/user.service'
+import keyService from '../../services/key.service'
+import storageService from '../../services/storage.service'
+
+
+chai.use(require('chai-http'))
+
 
 const { expect, request } = chai
 
 describe('Authenticate', () => {
   describe('POST /auth', () => {
     afterEach(async () => {
-      await UserService.client.flushdb()
+      await storageService.flushdb()
     })
 
     it('should return 404', async () => {
-      let res
+      let res: any
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
 
       try {
@@ -28,7 +32,7 @@ describe('Authenticate', () => {
     })
 
     it('should requare email and password', async () => {
-      let res
+      let res: any
       try {
         res = await request(app).post('/auth').send({})
       } catch (e) {
@@ -39,7 +43,7 @@ describe('Authenticate', () => {
 
     it('should authenticate user', async () => {
       const user = { email: 'test', company: 'test', password: 'test' }
-      await UserService.create(user)
+      await userService.create(user)
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
       const res = await request(app).post('/auth').send(params)
 
@@ -49,7 +53,7 @@ describe('Authenticate', () => {
 
   describe('POST /auth/verify', () => {
     after(async () => {
-      await KeyService.client.flushdb()
+      await storageService.flushdb()
     })
 
     it('should be valid token', async () => {
@@ -60,14 +64,14 @@ describe('Authenticate', () => {
         email: 'test',
         company: 'test'
       }
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       const res = await request(app).post('/auth/verify').send({ token })
 
       expect(res.body).to.equal(true)
     })
 
     it('should be invalid token', async () => {
-      let res
+      let res: any
 
       try {
         res = await request(app).post('/auth/verify').send({ token: 'test' })
@@ -81,7 +85,7 @@ describe('Authenticate', () => {
 
   describe('DELETE /auth/:sessionKey', () => {
     after(async () => {
-      await KeyService.client.flushdb()
+      await storageService.flushdb()
     })
 
     it('should delete session', async () => {
@@ -92,19 +96,19 @@ describe('Authenticate', () => {
         email: 'test',
         company: 'test'
       }
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       const sessionKey = jwt.decode(token).jti
-      const res = await request(app).delete(`/auth/${sessionKey}`)
+      const res = await request(app).del(`/auth/${sessionKey}`)
 
       expect(res.status).to.equal(204)
     })
 
     it('should return 404', async () => {
-      let res
+      let res: any
 
       try {
-        res = await request(app).delete('/auth/test')
-      } catch(e) {
+        res = await request(app).del('/auth/test')
+      } catch (e) {
         res = e
       }
 

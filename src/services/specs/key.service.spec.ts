@@ -1,23 +1,24 @@
 import { expect } from 'chai'
-import jwt from 'jsonwebtoken'
-import KeyService from './KeyService'
-import UserService from './UserService'
+import * as jwt from 'jsonwebtoken'
+import storageService from '../storage.service'
+import keyService from '../key.service'
+import userService from '../user.service'
 
-describe('KeyService', () => {
+describe('keyService', () => {
   afterEach(async () => {
-    await UserService.client.flushdb()
+    await storageService.flushdb()
   })
 
   describe('#set', () => {
     before(async () => {
       const userData = { email: 'test', company: 'test', password: 'test' }
-      await UserService.create(userData)
+      await userService.create(userData)
     })
 
     it('should create session', async () => {
-      const userStr = await UserService.get('test:test')
+      const userStr = await userService.get('test:test')
       const user = JSON.parse(userStr)
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       const data = jwt.decode(token)
 
       expect(data.login).to.equal('test:test')
@@ -35,14 +36,14 @@ describe('KeyService', () => {
         email: 'test',
         company: 'test'
       }
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       sessionKey = jwt.decode(token).jti
     })
 
     it('should return session', async () => {
-      const userKey = await KeyService.get(sessionKey)
+      const userKey = await keyService.get(sessionKey)
 
-      expect(userKey).to.exists
+      expect(userKey).to.exist
     })
   })
 
@@ -57,12 +58,12 @@ describe('KeyService', () => {
         email: 'test',
         company: 'test'
       }
-      const token = await KeyService.set(user, 'test')
+      const token = await keyService.set(user, 'test')
       sessionKey = jwt.decode(token).jti
     })
 
     it('should delete session', async () => {
-      const userKey = await KeyService.delete(sessionKey)
+      const userKey = await keyService.delete(sessionKey)
 
       expect(userKey).to.equal(1)
     })

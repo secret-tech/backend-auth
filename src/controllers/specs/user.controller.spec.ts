@@ -1,8 +1,8 @@
-import chai from 'chai'
-import chaiHTTP from 'chai-http'
-import app from '../app'
+import { Response } from 'express'
+import * as chai from 'chai'
 
-chai.use(chaiHTTP)
+import app from '../../app'
+
 
 const { expect, request } = chai
 
@@ -16,10 +16,10 @@ describe('Users', () => {
     })
 
     it('should requare email and password', async () => {
-      let res
+      let res: any
       try {
         res = await request(app).post('/user').send({})
-      } catch(e) {
+      } catch (e) {
         res = e
       }
       expect(res.status).to.equal(400)

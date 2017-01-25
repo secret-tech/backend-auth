@@ -5,6 +5,6 @@ const router: Router = Router()
 const controller: SessionController = new SessionController()
 
 router
-  .get('/:sessionKey', controller.view);
+  .get('/:sessionKey', controller.view)
 
 export default router
