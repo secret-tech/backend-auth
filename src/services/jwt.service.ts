@@ -76,6 +76,10 @@ export class JWTService {
     }
   }
 
+  static decode(token: string): any {
+    return jwt.decode(token);
+  }
+
 
   /**
    * Generate secret key

@@ -41,16 +41,17 @@ export class UserService {
     }
 
     const password: string = bcrypt.hashSync(passwordHash)
-    const login: string = `${company}:${email}`
-
-    return this.client.set(login, JSON.stringify({
+    const login: string = `${company}:${email}`;
+    const data: any = {
       id: uuid.v4(),
       login,
       password,
       email,
       company,
       scope
-    }))
+    };
+    this.client.set(login, JSON.stringify(data));
+    return data;
   }
 }
 

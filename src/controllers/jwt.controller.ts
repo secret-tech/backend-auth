@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt-nodejs'
 import jwtService from '../services/jwt.service'
 import keyService from '../services/key.service'
 import userService from '../services/user.service'
+import {JWTService} from "../services/jwt.service";
 
 
 /**
@@ -96,17 +97,17 @@ class JWTController {
    * @param  res  express res object
    */
   async verify(req: Request, res: Response): Promise<void> {
-    const { token } = req.body
-    const isValid = await jwtService.verify(token)
+    const { token } = req.body;
+    const isValid = await jwtService.verify(token);
 
     if (!isValid) {
       res.status(400).send({
         error: 'invalid token'
-      })
+      });
       return
     }
 
-    res.send(isValid)
+    res.send({decoded: JWTService.decode(token)})
   }
 }
 

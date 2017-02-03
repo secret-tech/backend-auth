@@ -20,13 +20,13 @@ class UserController {
       res.status(400).send({
         error: 'email and password are required parameters',
         status: 400
-      })
-      return
+      });
+      return;
     }
 
     const result = await userService.create({ email, password, company, scope })
 
-    res.json(result)
+    res.json(result);
   }
 }
 
