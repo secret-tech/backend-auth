@@ -7,7 +7,7 @@
     "lint": "tslint ./src/**/*.ts",
     "test": "nyc mocha ./src/**/*.spec.ts",
     "build": "tsc --outDir dist src/bin/www",
-    "serve": "node ./dist/bin/www"
+    "serve": "node ./dist/bin/www.js"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
