@@ -1,10 +1,11 @@
-FROM node:6.9.4
+FROM mhart/alpine-node:6.11.0
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-ADD package.json /usr/src/app
+ADD ./ /usr/src/app
 RUN npm i
-ADD ./dist /usr/src/app/dist
+RUN mkdir ./dist
+RUN npm run build
 
 CMD npm start
