@@ -2,7 +2,7 @@ version: '2'
 services:
 
   auth:
-    image: registry.jincor.com/backend-auth:latest
+    image: registry.jincor.com/backend/auth:latest
     build: ./
     environment:
       REDIS_HOST: redis
@@ -15,6 +15,6 @@ services:
       - redis
 
   redis:
-    image: registry.jincor.com/backend-redis:latest
+    image: registry.jincor.com/backend/redis:latest
     ports:
       - "6379:6379"
