@@ -1,6 +1,6 @@
 # Jincor Auth microservice
 
-[![Build Status](http://jenkins.jincor.com/job/JincorTech/job/backend-auth/job/master/badge/icon)](http://jenkins.jincor.com/job/JincorTech/job/backend-auth/job/master/)
+[![Build Status](http://jenkins.jincor.com/buildStatus/icon?job=JincorTech/backend-auth/master)](http://jenkins.jincor.com/job/JincorTech/job/backend-auth/job/master/)
 
 ## TODO:
 3. Tests
