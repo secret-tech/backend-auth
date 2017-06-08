@@ -2,6 +2,7 @@ version: '2'
 services:
 
   auth:
+    image: registry.jincor.com/backend-auth:latest
     build: ./
     environment:
       REDIS_HOST: redis
