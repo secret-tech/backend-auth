@@ -31,6 +31,7 @@ export class JWTService {
    */
   generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string {
     const { id, login, scope } = user
+    const email = login.split(':')[1]
 
     if (!id || !login) {
       throw new Error('user.id and user.login are required parameters')
@@ -42,7 +43,9 @@ export class JWTService {
       scope,
       deviceId,
       jti: sessionKey,
-      iat: issuedAt
+      iat: issuedAt,
+      sub: email,
+      aud: 'jincor.com'
     }
 
     const secret = this.generateSecret(userKey)
