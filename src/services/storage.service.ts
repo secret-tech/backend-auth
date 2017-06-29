@@ -3,8 +3,7 @@ import * as redis from 'redis'
 
 import config from '../config'
 
-const {redis: {port, host}} = config
-
+const {redis: {port, host, prefix}} = config
 
 export interface StorageService {
   client: RedisClient
@@ -26,26 +25,30 @@ class RedisService implements StorageService {
 
   set(key: string, value: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.client.set(key, value, (err, result) => err ? reject(err) : resolve(result))
+      this.client.set(this.getKey(key), value, (err, result) => err ? reject(err) : resolve(result))
     })
   }
 
   get(key: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.client.get(key, (err, result) => err ? reject(err) : resolve(result))
+      this.client.get(this.getKey(key), (err, result) => err ? reject(err) : resolve(result))
     })
   }
 
   expire(key: string, time: number): Promise<number> {
     return new Promise((resolve, reject) => {
-      this.client.expire(key, time, (err, result) => err ? reject(err) : resolve(result))
+      this.client.expire(this.getKey(key), time, (err, result) => err ? reject(err) : resolve(result))
     })
   }
 
   del(key: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.del(key, (err, result) => err ? reject(err) : resolve(result))
+      this.client.del(this.getKey(key), (err, result) => err ? reject(err) : resolve(result))
     })
+  }
+
+  getKey(key: string): string {
+    return prefix + key
   }
 }
 

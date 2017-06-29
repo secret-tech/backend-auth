@@ -25,7 +25,7 @@ export class JWTService {
    * @param  deviceId   device id
    * @param  sessionKey current user's session
    * @param  userKey    user's unique key
-   * @param  ussuedAt   time of creation
+   * @param  issuedAt   time of creation
    * @param  expiresIn  expiration time
    * @return  generated token
    */
@@ -48,9 +48,8 @@ export class JWTService {
     }
 
     const secret = this.generateSecret(userKey)
-    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
 
-    return token
+    return jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
   }
 
 
@@ -79,7 +78,7 @@ export class JWTService {
   }
 
   static decode(token: string): any {
-    return jwt.decode(token);
+    return jwt.decode(token)
   }
 
 

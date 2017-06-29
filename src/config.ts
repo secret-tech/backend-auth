@@ -15,6 +15,7 @@ export default {
 	},
 	redis: {
 		port: parseInt(REDIS_PORT, 10) || 6379,
-		host: REDIS_HOST || 'localhost'
+		host: REDIS_HOST || 'localhost',
+		prefix: 'jincor_auth_'
 	}
 }
