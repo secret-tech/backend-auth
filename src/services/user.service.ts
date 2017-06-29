@@ -30,28 +30,38 @@ export class UserService {
   /**
    * Save user's data
    *
-   * @param  userData  user info
-   * @return           promise   
+   * @param userData user info
+   * @return promise
    */
-  create(userData: any): Promise<string> {
-    const { email, company, password: passwordHash, scope } = userData
+  create(userData: any): Promise<any> {
+    const { email, tenant, password: passwordHash, scope } = userData
 
-    if (!email || !passwordHash) {
-      throw new Error('email and password are required parameters')
+    if (!email || !passwordHash || !tenant) {
+      throw new Error('Email, password and tenant are required parameters')
     }
 
     const password: string = bcrypt.hashSync(passwordHash)
-    const login: string = `${company}:${email}`;
+    const login: string = `${tenant}:${email}`
     const data: any = {
       id: uuid.v4(),
       login,
       password,
       email,
-      company,
+      tenant,
       scope
-    };
-    this.client.set(login, JSON.stringify(data));
-    return data;
+    }
+    this.client.set(login, JSON.stringify(data))
+    return data
+  }
+
+  /**
+   * Deletes user by login
+   *
+   * @param login
+   * @return promise
+   */
+  del(login: string): Promise<any> {
+    return this.client.del(login)
   }
 }
 

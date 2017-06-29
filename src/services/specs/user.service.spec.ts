@@ -9,10 +9,10 @@ describe('userService', () => {
 
   describe('#create', () => {
     it('should create new user', async () => {
-      const user = { email: 'test', company: 'test', password: 'test' }
+      const user = { email: 'test', tenant: 'test', password: 'test' }
       const result = await userService.create(user)
 
-      expect(result).to.equal('OK')
+      expect(result).to.be.a('object')
     })
 
     it('should require an email', async () => {
@@ -25,7 +25,7 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('email and password are required parameters')
+      expect(error.message).to.equal('Email, password and tenant are required parameters')
     })
 
     it('should require an password', async () => {
@@ -38,7 +38,7 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('email and password are required parameters')
+      expect(error.message).to.equal('Email, password and tenant are required parameters')
     })
 
     it('should require password and email', async () => {
@@ -51,13 +51,13 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('email and password are required parameters')
+      expect(error.message).to.equal('Email, password and tenant are required parameters')
     })
   })
 
   describe('#get', () => {
     before(async () => {
-      const userData = { email: 'test', company: 'test', password: 'test' }
+      const userData = { email: 'test', tenant: 'test', password: 'test' }
       await userService.create(userData)
     })
 

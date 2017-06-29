@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt-nodejs'
 import jwtService from '../services/jwt.service'
 import keyService from '../services/key.service'
 import userService from '../services/user.service'
-import {JWTService} from "../services/jwt.service";
+import {JWTService} from '../services/jwt.service'
 
 
 /**
@@ -13,7 +13,7 @@ import {JWTService} from "../services/jwt.service";
 class JWTController {
 
   /**
-   * Generate and renpond with token
+   * Generate and respond with token
    *
    * @param  req  express req object
    * @param  res  express res object
@@ -63,51 +63,48 @@ class JWTController {
   }
 
   /**
-   * Delete user's session
-   *
-   * @param  req  express req object
-   * @param  res  express res object
-   * @param  next express next middleware function
-   */
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { sessionKey }  = req.params
-
-      if (!sessionKey) {
-        res.status(400).send({
-          error: 'sessionKey is a required parameter'
-        })
-        return
-      }
-
-      const result = await keyService.delete(sessionKey)
-
-      result
-        ? res.status(204).send()
-        : res.status(404).send()
-    } catch (e) {
-      next(e)
-    }
-  }
-
-  /**
    * Verify user's token
    *
    * @param  req  express req object
    * @param  res  express res object
    */
   async verify(req: Request, res: Response): Promise<void> {
-    const { token } = req.body;
-    const isValid = await jwtService.verify(token);
+    const { token } = req.body
+    const isValid = await jwtService.verify(token)
 
     if (!isValid) {
       res.status(400).send({
         error: 'invalid token'
-      });
+      })
       return
     }
 
     res.send({decoded: JWTService.decode(token)})
+  }
+
+  /**
+   * Logout a user
+   *
+   * @param  req  express req object
+   * @param  res  express res object
+   */
+  async logout(req: Request, res: Response): Promise<void> {
+    const { token } = req.body
+    const isValid = await jwtService.verify(token)
+
+    if (!isValid) {
+      res.status(400).send({
+        error: 'invalid token'
+      })
+      return
+    }
+
+    const decoded = JWTService.decode(token)
+    const result = await keyService.delete(decoded.jti)
+
+    result
+        ? res.status(200).send({result: result})
+        : res.status(404).send({error: 'Session does not exist or has expired. Please sign in to continue.'})
   }
 }
 

@@ -1,6 +1,4 @@
-import { Response } from 'express'
 import * as chai from 'chai'
-import * as jwt from 'jsonwebtoken'
 
 import app from '../../app'
 import userService from '../../services/user.service'
@@ -25,13 +23,13 @@ describe('Authenticate', () => {
 
       try {
         res = await request(app).post('/auth').send(params)
-      } catch(e) {
+      } catch (e) {
         res = e
       }
       expect(res.status).to.equal(404)
     })
 
-    it('should requare email and password', async () => {
+    it('should require email and password', async () => {
       let res: any
       try {
         res = await request(app).post('/auth').send({})
@@ -42,12 +40,62 @@ describe('Authenticate', () => {
     })
 
     it('should authenticate user', async () => {
-      const user = { email: 'test', company: 'test', password: 'test' }
+      const user = { email: 'test', tenant: 'test', password: 'test' }
       await userService.create(user)
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
       const res = await request(app).post('/auth').send(params)
 
       expect(res.status).to.equal(200)
+    })
+
+    it('should respond with 403 error code when password is incorrect', async () => {
+      const user = { email: 'test', tenant: 'test', password: 'test' }
+      await userService.create(user)
+      const params = { login: 'test:test', password: 'test1', deviceId: 'test' }
+
+      let res: any
+
+      try {
+        res = await request(app).post('/auth').send(params)
+      } catch (e) {
+        res = e
+      }
+
+      expect(res.status).to.equal(403)
+    })
+  })
+
+  describe('POST /auth/logout', () => {
+    afterEach(async () => {
+      await storageService.flushdb()
+    })
+
+    it('should logout', async () => {
+      const user = {
+        id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
+        login: 'test:test',
+        password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
+        email: 'test',
+        tenant: 'test'
+      }
+      const token = await keyService.set(user, 'test')
+      const res = await request(app).post('/auth/logout').send({ token })
+
+      expect(res.status).to.equal(200)
+      expect(res.body.result).to.equal(1)
+    })
+
+    it('should respond with 400 code when logout with incorrect token', async () => {
+      const token = '123'
+      let res: any
+
+      try {
+        res = await request(app).post('/auth/logout').send({token})
+      } catch (e) {
+        res = e
+      }
+
+      expect(res.status).to.equal(400)
     })
   })
 
@@ -62,12 +110,13 @@ describe('Authenticate', () => {
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        company: 'test'
+        tenant: 'test'
       }
       const token = await keyService.set(user, 'test')
       const res = await request(app).post('/auth/verify').send({ token })
 
-      expect(res.body).to.equal(true)
+      expect(res.body).to.be.a('object')
+      expect(res.body.decoded).to.be.a('object')
     })
 
     it('should be invalid token', async () => {
@@ -75,7 +124,7 @@ describe('Authenticate', () => {
 
       try {
         res = await request(app).post('/auth/verify').send({ token: 'test' })
-      } catch(e) {
+      } catch (e) {
         res = e
       }
 
@@ -83,36 +132,4 @@ describe('Authenticate', () => {
     })
   })
 
-  describe('DELETE /auth/:sessionKey', () => {
-    after(async () => {
-      await storageService.flushdb()
-    })
-
-    it('should delete session', async () => {
-      const user = {
-        id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
-        login: 'test:test',
-        password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
-        email: 'test',
-        company: 'test'
-      }
-      const token = await keyService.set(user, 'test')
-      const sessionKey = jwt.decode(token).jti
-      const res = await request(app).del(`/auth/${sessionKey}`)
-
-      expect(res.status).to.equal(204)
-    })
-
-    it('should return 404', async () => {
-      let res: any
-
-      try {
-        res = await request(app).del('/auth/test')
-      } catch (e) {
-        res = e
-      }
-
-      expect(res.status).to.equal(404)
-    })
-  })
 })
