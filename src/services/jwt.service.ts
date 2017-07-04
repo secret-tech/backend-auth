@@ -25,12 +25,12 @@ export class JWTService {
    * @param  deviceId   device id
    * @param  sessionKey current user's session
    * @param  userKey    user's unique key
-   * @param  ussuedAt   time of creation
+   * @param  issuedAt   time of creation
    * @param  expiresIn  expiration time
    * @return  generated token
    */
   generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string {
-    const { id, login, scope } = user
+    const { id, login, scope, sub } = user
 
     if (!id || !login) {
       throw new Error('user.id and user.login are required parameters')
@@ -42,13 +42,14 @@ export class JWTService {
       scope,
       deviceId,
       jti: sessionKey,
-      iat: issuedAt
+      iat: issuedAt,
+      sub,
+      aud: 'jincor.com'
     }
 
     const secret = this.generateSecret(userKey)
-    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
 
-    return token
+    return jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
   }
 
 
@@ -77,7 +78,7 @@ export class JWTService {
   }
 
   static decode(token: string): any {
-    return jwt.decode(token);
+    return jwt.decode(token)
   }
 
 

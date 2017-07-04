@@ -6,7 +6,7 @@ const controller: JWTController = new JWTController()
 
 router
   .post('/', controller.create)
-  .delete('/:sessionKey', controller.delete)
   .post('/verify', controller.verify)
+  .post('/logout', controller.logout)
 
 export default router

@@ -11,7 +11,7 @@ describe('keyService', () => {
 
   describe('#set', () => {
     before(async () => {
-      const userData = { email: 'test', company: 'test', password: 'test' }
+      const userData = { email: 'test', tenant: 'test', password: 'test' }
       await userService.create(userData)
     })
 
@@ -34,7 +34,7 @@ describe('keyService', () => {
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        company: 'test'
+        tenant: 'test'
       }
       const token = await keyService.set(user, 'test')
       sessionKey = jwt.decode(token).jti

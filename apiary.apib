@@ -1,0 +1,170 @@
+FORMAT: 1A
+HOST: http://auth:3000/
+
+# Jincor AUTH Service
+
+Jincor Auth is a service that manages JWT-authentication, it's main responsibilities are:
+
+1. Users management.
+2. Generation of JWT tokens.
+3. Validation of JWT tokens.
+
+
+Common workflow is following:
+
+1. Create a user.
+2. Login the user, save received token.
+3. Verify saved token whenever authentication required.
+4. Logout the user when necessary.
+5. Delete the user when his account is not active anymore or deleted.
+
+# Group User
+
+## Create user [/user]
+
+**Important note:**
+"Scope" field is used to store user permissions.
+It might be either just a string containing user role (e.g. "company-admin")
+or an object describing what operations user can perform with resources (e.g. {
+    "company": [
+        "create",
+        "read",
+        "update",
+        "delete"
+    ],
+    "employee": [
+        "read"
+    ]
+})
+
+
+###  Create new user [POST]
+
++ Request (application/json)
+
+        {
+            "email": "test@test.com",
+            "tenant": "tenant_id",
+            "password": "password_hash",
+            "scope": "user_scope"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+            "login": "tenant_id:test@test.com",
+            "password": "$2a$10$vVYXAgrX1ZRpa760frwwxuTTU/plkza0JUF09uUFyGxrHz7ItCw8y",
+            "email": "test@test.com",
+            "tenant": "tenant_id",
+            "scope": "user_scope"
+        }
+
+## Delete user [/user/{login}]
+
+###  Delete a user [DELETE]
+
++ Response 200 (application/json)
+
+        {
+            "result": 1
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "Specified login does not exist or was already deleted."
+        }
+
+# Group Auth
+
+## Login a user [/auth]
+
+### Login [POST]
+
++ Request (application/json)
+
+        {
+            "login": "tenant_id:test@test.com",
+            "password": "password_hash",
+            "scope": "user_scope"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "accessToken": "jwt_token"
+        }
+
++ Response 403 (application/json)
+
+        {
+            "error": "Incorrect password",
+            "status": 403
+        }
+
++ Response 404 (application/json)
+
+        {
+            "error": "User does not exist",
+            "status": 404
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "login, password and deviceId are required parameters",
+            "status": 400
+        }
+
+## Verify token [/auth/verify]
+
+### Verify [POST]
+
++ Request (application/json)
+
+        {
+            "token": "jwt_token"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "decoded": {
+                "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+                "login": "tenant_id:test@test.com",
+                "scope": "user_scope",
+                "deviceId": "12345",
+                "jti": "0107bfcf-2f42-4e83-99e9-3ba44b737302123451498632187982",
+                "iat": 1498632187982,
+                "exp": 1498632792782
+            }
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "invalid token"
+        }
+
+## Logout [/auth/logout]
+
+### Logout [POST]
+
++ Request (application/json)
+
+        {
+            "token": "jwt_token"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "result": 1
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "invalid token"
+        }

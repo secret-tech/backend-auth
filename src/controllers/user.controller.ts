@@ -14,19 +14,42 @@ class UserController {
    * @param  res  express res object
    */
   async create(req: Request, res: Response): Promise<void> {
-    const { email, company, password, scope } = req.body
+    const { email, tenant, password, scope } = req.body
 
     if (!email || !password) {
       res.status(400).send({
         error: 'email and password are required parameters',
         status: 400
-      });
-      return;
+      })
+      return
     }
 
-    const result = await userService.create({ email, password, company, scope })
+    const result = await userService.create({ email, password, tenant, scope })
 
-    res.json(result);
+    res.json(result)
+  }
+
+  /**
+   * Create user
+   *
+   * @param  req  express req object
+   * @param  res  express res object
+   */
+  async del(req: Request, res: Response): Promise<void> {
+    const { login } = req.params
+
+    if (!login) {
+      res.status(400).send({
+        error: 'login is a required parameter'
+      })
+      return
+    }
+
+    const result = await userService.del(login)
+
+    result
+        ? res.status(200).send({result: 1})
+        : res.status(404).send({error: 'Specified login does not exist or was already deleted.'})
   }
 }
 

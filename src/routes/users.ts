@@ -6,5 +6,6 @@ const controller: UserController = new UserController()
 
 router
 	.post('/', controller.create)
+	.delete('/:login', controller.del)
 
 export default router

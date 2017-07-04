@@ -3,18 +3,21 @@ services:
 
   auth:
     image: registry.jincor.com/backend/auth:latest
-    build: ./
+    build:
+        context: ./
+        dockerfile: Dockerfile.prod
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      JWT_KEY: "uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r"
     ports:
       - "3000:3000"
     volumes:
-      - /usr/src/app
+      - ./:/usr/src/app
     links:
       - redis
 
   redis:
     image: registry.jincor.com/backend/redis:latest
     ports:
-      - "6379:6379"
+      - "6379"

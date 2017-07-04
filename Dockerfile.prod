@@ -1,9 +1,10 @@
 FROM mhart/alpine-node:6.11.0
 
 RUN mkdir -p /usr/src/app
+ADD . /usr/src/app
+
 WORKDIR /usr/src/app
 
-ADD ./ /usr/src/app
 RUN npm i
 RUN mkdir ./dist
 RUN npm run build
