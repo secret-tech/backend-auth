@@ -14,7 +14,7 @@ class UserController {
    * @param  res  express res object
    */
   async create(req: Request, res: Response): Promise<void> {
-    const { email, tenant, password, scope } = req.body
+    const { email, tenant, password, scope, sub } = req.body
 
     if (!email || !password) {
       res.status(400).send({
@@ -24,7 +24,7 @@ class UserController {
       return
     }
 
-    const result = await userService.create({ email, password, tenant, scope })
+    const result = await userService.create({ email, password, tenant, scope, sub })
 
     res.json(result)
   }
