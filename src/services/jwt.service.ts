@@ -32,7 +32,7 @@ export class JWTService {
   generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string {
     const { id, login, scope, sub } = user
 
-    if (!id || !login) {
+    if (!id || !login || !sub) {
       throw new Error('user.id and user.login are required parameters')
     }
 
