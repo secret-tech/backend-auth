@@ -34,7 +34,7 @@ export class UserService {
    * @return promise
    */
   create(userData: any): Promise<any> {
-    const { email, tenant, password: passwordHash, scope, sub } = userData
+    const { email, tenant, password: passwordHash, scope } = userData
 
     if (!email || !passwordHash || !tenant) {
       throw new Error('Email, password and tenant are required parameters')
@@ -48,8 +48,7 @@ export class UserService {
       password,
       email,
       tenant,
-      scope,
-      sub
+      scope
     }
     this.client.set(login, JSON.stringify(data))
     return data
