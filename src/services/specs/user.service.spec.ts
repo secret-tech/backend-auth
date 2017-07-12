@@ -9,14 +9,14 @@ describe('userService', () => {
 
   describe('#create', () => {
     it('should create new user', async () => {
-      const user = { email: 'test', tenant: 'test', password: 'test' }
+      const user = { email: 'test', tenant: 'test', password: 'test', sub: '123', }
       const result = await userService.create(user)
 
       expect(result).to.be.a('object')
     })
 
     it('should require an email', async () => {
-      const user = { email: '', company: 'test', password: 'test' }
+      const user = { email: '', company: 'test', password: 'test',  sub: '123', }
       let error: Error
 
       try {
@@ -25,11 +25,11 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
+      expect(error.message).to.equal('Email, password, tenant and sub are required parameters')
     })
 
     it('should require an password', async () => {
-      const user = { email: 'test', company: 'test', password: '' }
+      const user = { email: 'test', company: 'test', password: '',  sub: '123', }
       let error: Error
 
       try {
@@ -38,11 +38,11 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
+      expect(error.message).to.equal('Email, password, tenant and sub are required parameters')
     })
 
     it('should require password and email', async () => {
-      const user = { email: '', company: 'test', password: '' }
+      const user = { email: '', company: 'test', password: '',  sub: '123', }
       let error: Error
 
       try {
@@ -51,13 +51,13 @@ describe('userService', () => {
         error = e
       }
 
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
+      expect(error.message).to.equal('Email, password, tenant and sub are required parameters')
     })
   })
 
   describe('#get', () => {
     before(async () => {
-      const userData = { email: 'test', tenant: 'test', password: 'test' }
+      const userData = { email: 'test', tenant: 'test', password: 'test',  sub: '123', }
       await userService.create(userData)
     })
 
