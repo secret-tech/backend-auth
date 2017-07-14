@@ -17,7 +17,7 @@ export default {
 		port: parseInt(PORT, 10) || 3000,
 		httpsPort: parseInt(HTTPS_PORT, 10) || 4000,
 		httpsServer: HTTPS_SERVER || 'disabled',
-		forceHttps: FORCE_HTTPS || 'enabled'
+		forceHttps: FORCE_HTTPS || 'disabled'
 	},
 	key_service: {
 		expires_seconds: 604800
