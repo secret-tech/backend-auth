@@ -15,7 +15,7 @@ export class RequestThrottler {
    *
    * @param  redisClient  redis client
    */
-  constructor(private redisClient: RedisClient) {
+  constructor(redisClient: RedisClient) {
     this.limiter = RateLimiter({
       redis: redisClient,
       namespace: prefix,
@@ -26,11 +26,21 @@ export class RequestThrottler {
   }
 
   throttle(req: Request, res: Response, next: NextFunction) {
-    if (whiteList.indexOf(req.ip) !== -1) {
+    let ip = req.ip
+
+    /*
+     Check if IP has ipv6 prefix and remove it.
+     See: https://stackoverflow.com/questions/29411551/express-js-req-ip-is-returning-ffff127-0-0-1
+     */
+    if (ip.substr(0, 7) === '::ffff:') {
+      ip = ip.substr(7)
+    }
+
+    if (whiteList.indexOf(ip) !== -1) {
       return next()
     }
 
-    this.limiter(req.ip, (err, timeLeft) => {
+    this.limiter(ip, (err, timeLeft) => {
       if (err) {
         return res.status(500).send()
       } else if (timeLeft) {

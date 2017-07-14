@@ -51,15 +51,15 @@ Checklist of the most important security countermeasures when designing, testing
 
 ### Access
 - [x] Limit requests (Throttling) to avoid DDoS / Bruteforce attacks.
-- [ ] Use HTTPS on server side to avoid MITM (Man In The Middle Attack).
-- [ ] Use `HSTS` header with SSL to avoid SSL Strip attack.
+- [x] Use HTTPS on server side to avoid MITM (Man In The Middle Attack).
+- [x] Use `HSTS` header with SSL to avoid SSL Strip attack.
 
 ### Input
 - [x] Use proper HTTP method according to operation , `GET (read)`, `POST (create)`, `PUT (replace/update)` and `DELETE (to delete a record)`.
 - [x] Validate `content-type` on request Accept header ( Content Negotiation ) to allow only your supported format (e.g. `application/xml` , `application/json` ... etc) and respond with `406 Not Acceptable` response if not matched.
 - [x] Validate `content-type` of posted data as you accept (e.g. `application/x-www-form-urlencoded` , `multipart/form-data ,application/json` ... etc ).
 - [ ] Validate User input to avoid common vulnerabilities (e.g. `XSS`, `SQL-Injection` , `Remote Code Execution` ... etc).
-- [ ] Don't use any sensitive data ( `credentials` , `Passwords`, `security tokens`, or `API keys`) in the URL, but use standard Authorization header.
+- [x] Don't use any sensitive data ( `credentials` , `Passwords`, `security tokens`, or `API keys`) in the URL, but use standard Authorization header.
 
 ### Processing
 - [ ] Check if all endpoint protected behind the authentication to avoid broken authentication.

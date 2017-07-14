@@ -9,9 +9,11 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      FORCE_HTTPS: disabled
       JWT_KEY: "uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r"
     ports:
       - "3000:3000"
+      - "4000:4000"
     volumes:
       - ./:/usr/src/app
     links:
