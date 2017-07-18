@@ -14,17 +14,17 @@ class UserController {
    * @param  res  express res object
    */
   async create(req: Request, res: Response): Promise<void> {
-    const { email, tenant, password, scope } = req.body
+    const { email, tenant, password, scope, sub } = req.body
 
-    if (!email || !password) {
+    if (!email || !password || !sub || !tenant) {
       res.status(400).send({
-        error: 'email and password are required parameters',
+        error: 'email, password, tenant and sub are required parameters',
         status: 400
       })
       return
     }
 
-    const result = await userService.create({ email, password, tenant, scope })
+    const result = await userService.create({ email, password, tenant, scope, sub })
 
     res.json(result)
   }

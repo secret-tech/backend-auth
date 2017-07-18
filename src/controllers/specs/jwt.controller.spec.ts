@@ -17,51 +17,41 @@ describe('Authenticate', () => {
       await storageService.flushdb()
     })
 
-    it('should return 404', async () => {
-      let res: any
+    it('should return 404', (done) => {
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
 
-      try {
-        res = await request(app).post('/auth').send(params)
-      } catch (e) {
-        res = e
-      }
-      expect(res.status).to.equal(404)
+      request(app).post('/auth').set('Accept', 'application/json').send(params).end((err, res) => {
+        expect(res.status).to.equal(404)
+        done()
+      })
     })
 
-    it('should require email and password', async () => {
-      let res: any
-      try {
-        res = await request(app).post('/auth').send({})
-      } catch (e) {
-        res = e
-      }
-      expect(res.status).to.equal(400)
+    it('should require email and password', (done) => {
+      request(app).post('/auth').set('Accept', 'application/json').send({}).end((err, res) => {
+        expect(res.status).to.equal(400)
+        done()
+      })
     })
 
-    it('should authenticate user', async () => {
-      const user = { email: 'test', tenant: 'test', password: 'test' }
-      await userService.create(user)
+    it('should authenticate user', (done) => {
+      const user = { email: 'test', tenant: 'test', password: 'test',  sub: '123', }
+      userService.create(user)
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
-      const res = await request(app).post('/auth').send(params)
-
-      expect(res.status).to.equal(200)
+      request(app).post('/auth').set('Accept', 'application/json').send(params).end((err, res) => {
+        expect(res.status).to.equal(200)
+        done()
+      })
     })
 
-    it('should respond with 403 error code when password is incorrect', async () => {
-      const user = { email: 'test', tenant: 'test', password: 'test' }
-      await userService.create(user)
+    it('should respond with 403 error code when password is incorrect', (done) => {
+      const user = { email: 'test', tenant: 'test', password: 'test',  sub: '123', }
+      userService.create(user)
       const params = { login: 'test:test', password: 'test1', deviceId: 'test' }
 
-      let res: any
-
-      try {
-        res = await request(app).post('/auth').send(params)
-      } catch (e) {
-        res = e
-      }
-
-      expect(res.status).to.equal(403)
+      request(app).post('/auth').set('Accept', 'application/json').send(params).end((err, res) => {
+        expect(res.status).to.equal(403)
+        done()
+      })
     })
   })
 
@@ -70,32 +60,31 @@ describe('Authenticate', () => {
       await storageService.flushdb()
     })
 
-    it('should logout', async () => {
+    it('should logout', (done) => {
       const user = {
         id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        tenant: 'test'
+        tenant: 'test',
+        sub: '123',
       }
-      const token = await keyService.set(user, 'test')
-      const res = await request(app).post('/auth/logout').send({ token })
 
-      expect(res.status).to.equal(200)
-      expect(res.body.result).to.equal(1)
+      keyService.set(user, 'test').then((token) => {
+        request(app).post('/auth/logout').set('Accept', 'application/json').send({ token }).end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(res.body.result).to.equal(1)
+          done()
+        })
+      })
     })
 
-    it('should respond with 400 code when logout with incorrect token', async () => {
+    it('should respond with 400 code when logout with incorrect token', (done) => {
       const token = '123'
-      let res: any
-
-      try {
-        res = await request(app).post('/auth/logout').send({token})
-      } catch (e) {
-        res = e
-      }
-
-      expect(res.status).to.equal(400)
+      request(app).post('/auth/logout').set('Accept', 'application/json').send({token}).end((err, res) => {
+        expect(res.status).to.equal(400)
+        done()
+      })
     })
   })
 
@@ -104,31 +93,30 @@ describe('Authenticate', () => {
       await storageService.flushdb()
     })
 
-    it('should be valid token', async () => {
+    it('should be valid token', (done) => {
       const user = {
         id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        tenant: 'test'
+        tenant: 'test',
+        sub: '123',
       }
-      const token = await keyService.set(user, 'test')
-      const res = await request(app).post('/auth/verify').send({ token })
 
-      expect(res.body).to.be.a('object')
-      expect(res.body.decoded).to.be.a('object')
+      keyService.set(user, 'test').then((token) => {
+        request(app).post('/auth/verify').set('Accept', 'application/json').send({ token }).end((err, res) => {
+          expect(res.body).to.be.a('object')
+          expect(res.body.decoded).to.be.a('object')
+          done()
+        })
+      })
     })
 
-    it('should be invalid token', async () => {
-      let res: any
-
-      try {
-        res = await request(app).post('/auth/verify').send({ token: 'test' })
-      } catch (e) {
-        res = e
-      }
-
-      expect(res.status).to.equal(400)
+    it('should be invalid token', (done) => {
+      request(app).post('/auth/verify').set('Accept', 'application/json').send({ token: 'test' }).end((err, res) => {
+        expect(res.status).to.equal(400)
+        done()
+      })
     })
   })
 

@@ -7,7 +7,8 @@ describe('jwtService', () => {
     it('should return token', () => {
       const user = {
         id: 'test',
-        login: 'test:test'
+        login: 'test:test',
+        sub: '123',
       }
       const token = jwtService.generate(user, 'device_id', 'key', 'user_key', Date.now(), 60)
 
@@ -17,7 +18,8 @@ describe('jwtService', () => {
     it('should require user.id and user.login', () => {
       const user = {
         id: '',
-        login: ''
+        login: '',
+        sub: '123',
       }
       let error: Error
 
@@ -38,7 +40,8 @@ describe('jwtService', () => {
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        company: 'test'
+        company: 'test',
+        sub: '123',
       }
       const token = await keyService.set(user, 'test')
       const isValid = await jwtService.verify(token)

@@ -7,4 +7,5 @@ ADD package.json /usr/src/app
 RUN npm i
 ADD . /usr/src/app
 EXPOSE 3000
+EXPOSE 4000
 CMD npm start
