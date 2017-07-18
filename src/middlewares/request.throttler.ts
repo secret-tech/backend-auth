@@ -1,28 +1,24 @@
-import * as redis from 'redis'
 import { Response, Request, NextFunction } from 'express'
 
-import config from '../config'
 import { RedisClient } from 'redis'
 import RateLimiter = require('rolling-rate-limiter')
 
-const {throttler: {prefix, interval, maxInInterval, minDifference, whiteList}} = config
-
 export class RequestThrottler {
   limiter: RateLimiter
+  whiteList: Array<string>
 
   /**
    * constructor
    *
    * @param  redisClient  redis client
+   * @param options
    */
-  constructor(redisClient: RedisClient) {
+  constructor(redisClient: RedisClient, options) {
     this.limiter = RateLimiter({
       redis: redisClient,
-      namespace: prefix,
-      interval: interval,
-      maxInInterval: maxInInterval,
-      minDifference: minDifference,
+      ...options
     })
+    this.whiteList = options.whiteList
   }
 
   throttle(req: Request, res: Response, next: NextFunction) {
@@ -36,7 +32,7 @@ export class RequestThrottler {
       ip = ip.substr(7)
     }
 
-    if (whiteList.indexOf(ip) !== -1) {
+    if (this.whiteList.indexOf(ip) !== -1) {
       return next()
     }
 
@@ -51,9 +47,3 @@ export class RequestThrottler {
     })
   }
 }
-
-const {redis: {port, host}} = config
-
-const redisClient = redis.createClient(port, host)
-
-export default new RequestThrottler(redisClient)

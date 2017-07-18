@@ -1,7 +1,5 @@
 import * as chai from 'chai'
-
 import app from '../../app'
-
 
 const { expect, request } = chai
 

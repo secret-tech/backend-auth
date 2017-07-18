@@ -1,20 +1,12 @@
 import * as express from 'express'
 import { Response, Request, NextFunction, Application } from 'express'
 import * as bodyParser from 'body-parser'
-import requestThrottler from './middlewares/request.throttler'
+import { RequestThrottler } from './middlewares/request.throttler'
 import config from './config'
+import * as redis from 'redis'
 
 import jwtRoutes from './routes/jwt'
 import userRoutes from './routes/users'
-
-class StatusError extends Error {
-  status: number
-
-  constructor(msg: string, status: number) {
-    super(msg)
-    this.status = status
-  }
-}
 
 const app: Application = express()
 
@@ -30,7 +22,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   }
 
   if (req.header('Accept') !== 'application/json') {
-    return res.status(406).send('There is no "Accept: application/json" header')
+    return res.status(406).json({
+      error: 'Unsupported "Accept" header',
+    })
   }
 
   res.setHeader('X-Content-Type-Options', 'nosniff')
@@ -41,11 +35,28 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.post('*', (req: Request, res: Response, next: NextFunction) => {
   if (req.header('Content-Type') !== 'application/json') {
-    return res.status(406).send('There is no "Content-Type: application/json" header')
+    return res.status(406).json({
+      error: 'Unsupported "Content-Type"',
+    })
   }
 
   return next()
 })
+
+const { throttler: { prefix, interval, maxInInterval, minDifference, whiteList } } = config
+const { redis: { port, host } } = config
+
+const redisClient = redis.createClient(port, host)
+
+const options = {
+  namespace: prefix,
+  interval: interval,
+  maxInInterval: maxInInterval,
+  minDifference: minDifference,
+  whiteList: whiteList
+}
+
+const requestThrottler = new RequestThrottler(redisClient, options)
 
 app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next))
 
@@ -68,13 +79,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 /**
  * Error handler
  */
-app.use((err: StatusError, req: Request, res: Response) => {
+app.use((err: Error, req: Request, res: Response) => {
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
 
   // render the error page
-  res.status(err.status || 500)
   res.json(res.locals)
 })
 

@@ -11,7 +11,6 @@
   },
   "nyc": {
     "exclude": [
-      "src/middlewares/request.throttler.ts",
       "src/**/*.spec.ts"
     ]
   },
