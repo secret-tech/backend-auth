@@ -1,20 +1,36 @@
-import storage, { StorageService } from './storage.service'
+import { StorageService, StorageServiceType } from './storage.service'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
-import KeyService from './key.service'
-import * as jwt from 'jsonwebtoken'
+import { KeyServiceInterface, KeyServiceType } from './key.service'
+import { injectable, inject } from 'inversify'
+import 'reflect-metadata'
+
+export interface TenantServiceInterface {
+  get: (key: string) => Promise<string>
+  create: (userData: any) => Promise<any>
+  login: (userData: any) => Promise<string>
+}
 
 /**
  * TenantService
  */
-export class TenantService {
-
+@injectable()
+export class TenantService implements TenantServiceInterface {
+  private client: StorageService
+  private keyService: KeyServiceInterface
   /**
    * constructor
    *
    * @param  client  redis client
+   * @param  keyService key service
    */
-  constructor(private client: StorageService) {}
+  constructor(
+    @inject(StorageServiceType) client: StorageService,
+    @inject(KeyServiceType) keyService: KeyServiceInterface
+  ) {
+    this.client = client
+    this.keyService = keyService
+  }
 
 
   /**
@@ -76,9 +92,10 @@ export class TenantService {
       throw new Error('Password is incorrect')
     }
 
-    return await KeyService.setTenantToken(data)
+    return await this.keyService.setTenantToken(data)
   }
 
 }
 
-export default new TenantService(storage)
+const TenantServiceType = Symbol('TenantService')
+export { TenantServiceType }

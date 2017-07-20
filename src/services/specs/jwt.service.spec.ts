@@ -1,6 +1,11 @@
 import { expect } from 'chai'
-import keyService from '../key.service'
-import jwtService from '../jwt.service'
+
+import { KeyServiceInterface, KeyServiceType} from '../key.service'
+import { JWTServiceType, JWTServiceInterface } from '../jwt.service'
+import { container } from '../../ioc.container'
+
+const jwtService = container.get<JWTServiceInterface>(JWTServiceType)
+const keyService = container.get<KeyServiceInterface>(KeyServiceType)
 
 describe('jwtService', () => {
   describe('#generate', () => {

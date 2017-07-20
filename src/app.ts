@@ -3,11 +3,9 @@ import { Response, Request, NextFunction, Application } from 'express'
 import * as bodyParser from 'body-parser'
 import { RequestThrottler } from './middlewares/request.throttler'
 import config from './config'
-import * as redis from 'redis'
 
-import jwtRoutes from './routes/jwt'
-import userRoutes from './routes/users'
-import tenantRoutes from './routes/tenant'
+import { InversifyExpressServer } from 'inversify-express-utils'
+import { container } from './ioc.container'
 
 const app: Application = express()
 
@@ -44,50 +42,13 @@ app.post('*', (req: Request, res: Response, next: NextFunction) => {
   return next()
 })
 
-const { throttler: { prefix, interval, maxInInterval, minDifference, whiteList } } = config
-const { redis: { port, host } } = config
-
-const redisClient = redis.createClient(port, host)
-
-const options = {
-  namespace: prefix,
-  interval: interval,
-  maxInInterval: maxInInterval,
-  minDifference: minDifference,
-  whiteList: whiteList
-}
-
-const requestThrottler = new RequestThrottler(redisClient, options)
+const requestThrottler = new RequestThrottler()
 
 app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-/**
- * Routes
- */
-app.use('/auth', jwtRoutes)
-app.use('/user', userRoutes)
-app.use('/tenant', tenantRoutes)
+let server = new InversifyExpressServer(container, null, null, app)
 
-/**
- * Respond with 404 if route was not found
- */
-app.use((req: Request, res: Response, next: NextFunction) => {
-  return res.status(404).send('Not found')
-})
-
-/**
- * Error handler
- */
-app.use((err: Error, req: Request, res: Response) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message
-  res.locals.error = req.app.get('env') === 'development' ? err : {}
-
-  // render the error page
-  res.json(res.locals)
-})
-
-export default app
+export default server.build()

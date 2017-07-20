@@ -1,5 +1,7 @@
 import { RedisClient } from 'redis'
 import * as redis from 'redis'
+import { injectable } from 'inversify'
+import 'reflect-metadata'
 
 import config from '../config'
 
@@ -14,8 +16,13 @@ export interface StorageService {
   del: (key: string) => Promise<any>
 }
 
-class RedisService implements StorageService {
-  constructor(public client: RedisClient) {}
+@injectable()
+export class RedisService implements StorageService {
+  client: RedisClient
+
+  constructor() {
+    this.client = redis.createClient(port, host)
+  }
 
   flushdb(): Promise<{}> {
     return new Promise((resolve, reject) => {
@@ -52,4 +59,5 @@ class RedisService implements StorageService {
   }
 }
 
-export default new RedisService(redis.createClient(port, host))
+const StorageServiceType = Symbol('StorageService')
+export { StorageServiceType }

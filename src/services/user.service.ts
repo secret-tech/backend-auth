@@ -1,20 +1,31 @@
-import storage, { StorageService } from './storage.service'
+import { StorageService, StorageServiceType } from './storage.service'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
-import {log} from "util";
+import { injectable, inject } from 'inversify'
+import 'reflect-metadata'
 
-
+export interface UserServiceInterface {
+  get: (key: string) => Promise<string>
+  create: (userData: any) => Promise<any>
+  del: (key: string) => Promise<any>
+  getKey: (tenant: string, login: string) => string
+}
 /**
  * UserService
  */
-export class UserService {
-
+@injectable()
+export class UserService implements UserServiceInterface {
+  private storageService: StorageService
   /**
    * constructor
    *
-   * @param  client  redis client
+   * @param  storageService  redis client
    */
-  constructor(private client: StorageService) {}
+  constructor(
+    @inject(StorageServiceType) storageService: StorageService
+  ) {
+    this.storageService = storageService
+  }
 
 
   /**
@@ -24,7 +35,7 @@ export class UserService {
    * @return        promise
    */
   get(key: string): Promise<string> {
-    return this.client.get(key)
+    return this.storageService.get(key)
   }
 
 
@@ -52,7 +63,7 @@ export class UserService {
       scope,
       sub,
     }
-    this.client.set(key, JSON.stringify(data))
+    this.storageService.set(key, JSON.stringify(data))
     return data
   }
 
@@ -63,7 +74,7 @@ export class UserService {
    * @return promise
    */
   del(key: string): Promise<any> {
-    return this.client.del(key)
+    return this.storageService.del(key)
   }
 
   getKey(tenant: string, login: string) {
@@ -71,4 +82,5 @@ export class UserService {
   }
 }
 
-export default new UserService(storage)
+const UserServiceType = Symbol('UserServiceInterface')
+export { UserServiceType }

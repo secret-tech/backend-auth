@@ -1,8 +1,13 @@
 import { expect } from 'chai'
 import * as jwt from 'jsonwebtoken'
-import storageService from '../storage.service'
-import keyService from '../key.service'
-import userService from '../user.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { KeyServiceInterface, KeyServiceType } from '../key.service'
+import { UserServiceType, UserServiceInterface } from '../user.service'
+import { container } from '../../ioc.container'
+
+const storageService = container.get<StorageService>(StorageServiceType)
+const keyService = container.get<KeyServiceInterface>(KeyServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 describe('keyService', () => {
   afterEach(async () => {
@@ -65,9 +70,9 @@ describe('keyService', () => {
     })
 
     it('should delete session', async () => {
-      const userKey = await keyService.delete(sessionKey)
+      const result = await keyService.del(sessionKey)
 
-      expect(userKey).to.equal(1)
+      expect(result).to.equal(1)
     })
   })
 })

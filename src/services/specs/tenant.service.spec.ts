@@ -1,7 +1,13 @@
+import { container } from '../../ioc.container'
 import { expect } from 'chai'
-import tenantService from '../tenant.service'
-import storageService from '../storage.service'
-import JWTService from '../jwt.service'
+import { JWTServiceType, JWTServiceInterface } from '../jwt.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { TenantServiceType, TenantServiceInterface } from '../tenant.service'
+
+
+const jwtService = container.get<JWTServiceInterface>(JWTServiceType)
+const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
+const storageService = container.get<StorageService>(StorageServiceType)
 
 describe('tenantService', () => {
   afterEach(async () => {
@@ -50,7 +56,7 @@ describe('tenantService', () => {
       const result = await tenantService.create(tenant)
       const token = await tenantService.login(tenant)
 
-      const verified = await JWTService.verify(token)
+      const verified = await jwtService.verify(token)
       expect(verified).to.be.equal(true)
     })
   })

@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express'
 import { AuthorizedRequest } from '../requests/authorized.request'
-import jwtService, { JWTService } from '../services/jwt.service'
+import { JWTServiceType, JWTServiceInterface } from '../services/jwt.service'
+import { container } from '../ioc.container'
 
 export class Auth {
   jwtService
@@ -9,7 +10,7 @@ export class Auth {
    * constructor
    */
   constructor() {
-    this.jwtService = jwtService
+    this.jwtService = container.get<JWTServiceInterface>(JWTServiceType)
   }
 
   async authenticate(req: AuthorizedRequest, res: Response, next: NextFunction) {
@@ -37,7 +38,7 @@ export class Auth {
       })
     }
 
-    req.tenant = JWTService.decode(token)
+    req.tenant = this.jwtService.decode(token)
     return next()
   }
 }

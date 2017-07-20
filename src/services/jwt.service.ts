@@ -1,22 +1,38 @@
 import config from '../config'
 import * as jwt from 'jsonwebtoken'
-import KeyService from './key.service'
+import { KeyServiceInterface, KeyServiceType } from './key.service'
+import { injectable, inject } from 'inversify'
+import 'reflect-metadata'
 
 const { algorithm, secret_separator, secret } = config.jwt
+
+export interface JWTServiceInterface {
+  generate: (user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number) => string
+  generateTenant: (tenant: any, sessionKey: string, userKey: string, issuedAt: number) => string
+  verify: (token: string) => Promise<boolean>
+  decode: (token: string) => any
+}
 
 /**
  *  JWT service
  */
-export class JWTService {
-
+@injectable()
+export class JWTService implements JWTServiceInterface {
+  private secret: string
+  private algorithm: string
+  private secret_separator: string
+  private keyService: KeyServiceInterface
   /**
    * Creates jwt service instance
    *
-   * @param  secret           secret key
-   * @param  algorithm        encrypted algorithm
-   * @param  secret_separator secret seporator
+   * @param  keyService
    */
-  constructor(private secret: string, private algorithm: string, private secret_separator: string) {}
+  constructor(@inject(KeyServiceType) keyService: KeyServiceInterface) {
+    this.secret = secret
+    this.algorithm = algorithm
+    this.secret_separator = secret_separator
+    this.keyService = keyService
+  }
 
   /**
    * Generate user's token
@@ -96,7 +112,7 @@ export class JWTService {
       return false
     }
 
-    const userKey = await KeyService.get(decoded.jti)
+    const userKey = await this.keyService.get(decoded.jti)
     const secret = this.generateSecret(userKey)
 
     try {
@@ -107,7 +123,7 @@ export class JWTService {
     }
   }
 
-  static decode(token: string): any {
+  decode(token: string): any {
     return jwt.decode(token)
   }
 
@@ -123,4 +139,5 @@ export class JWTService {
   }
 }
 
-export default new JWTService(secret, algorithm, secret_separator)
+const JWTServiceType = Symbol('JWTServiceInterface')
+export { JWTServiceType }

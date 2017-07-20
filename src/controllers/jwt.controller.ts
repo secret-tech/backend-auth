@@ -1,18 +1,30 @@
-import { Response, NextFunction } from 'express'
+import { Response, NextFunction, RequestHandler } from 'express'
 import { AuthorizedRequest } from '../requests/authorized.request'
 import * as bcrypt from 'bcrypt-nodejs'
 
-import jwtService from '../services/jwt.service'
-import keyService from '../services/key.service'
-import userService, {UserService} from '../services/user.service'
-import { JWTService } from '../services/jwt.service'
-import {log} from "util";
-
+import { JWTServiceType, JWTServiceInterface } from '../services/jwt.service'
+import { KeyServiceType, KeyServiceInterface } from '../services/key.service'
+import { UserServiceType, UserServiceInterface } from '../services/user.service'
+import { inject, injectable } from 'inversify'
+import { controller, httpPost } from 'inversify-express-utils'
+import 'reflect-metadata'
 
 /**
  * JWTController
  */
-class JWTController {
+@injectable()
+@controller(
+  '/auth',
+  'AuthMiddleware'
+)
+export class JWTController {
+  constructor(
+    @inject(JWTServiceType) private jwtService: JWTServiceInterface,
+    @inject(KeyServiceType) private keyService: KeyServiceInterface,
+    @inject(UserServiceType) private userService: UserServiceInterface,
+  ) {
+
+  }
 
   /**
    * Generate and respond with token
@@ -21,6 +33,7 @@ class JWTController {
    * @param  res  express res object
    * @param  next express next middleware function
    */
+  @httpPost('/')
   async create(req: AuthorizedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { login, password, deviceId } = req.body
@@ -33,8 +46,8 @@ class JWTController {
         return
       }
 
-      const key = userService.getKey(req.tenant.id, login)
-      const userStr = await userService.get(key)
+      const key = this.userService.getKey(req.tenant.id, login)
+      const userStr = await this.userService.get(key)
 
       if (!userStr) {
         res.status(404).send({
@@ -55,7 +68,7 @@ class JWTController {
         return
       }
 
-      const token = await keyService.set(user, deviceId)
+      const token = await this.keyService.set(user, deviceId)
 
       res.status(200).send({
         accessToken: token
@@ -71,9 +84,10 @@ class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
+  @httpPost('/verify')
   async verify(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
-    const isValid = await jwtService.verify(token)
+    const isValid = await this.jwtService.verify(token)
 
     if (!isValid) {
       res.status(400).send({
@@ -82,7 +96,7 @@ class JWTController {
       return
     }
 
-    res.send({decoded: JWTService.decode(token)})
+    res.send({decoded: this.jwtService.decode(token)})
   }
 
   /**
@@ -91,9 +105,10 @@ class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
+  @httpPost('/logout')
   async logout(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
-    const isValid = await jwtService.verify(token)
+    const isValid = await this.jwtService.verify(token)
 
     if (!isValid) {
       res.status(400).send({
@@ -102,13 +117,11 @@ class JWTController {
       return
     }
 
-    const decoded = JWTService.decode(token)
-    const result = await keyService.delete(decoded.jti)
+    const decoded = this.jwtService.decode(token)
+    const result = await this.keyService.del(decoded.jti)
 
     result
         ? res.status(200).send({ result: result })
         : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' })
   }
 }
-
-export default JWTController

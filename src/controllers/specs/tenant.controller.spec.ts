@@ -1,9 +1,14 @@
 import * as chai from 'chai'
 import app from '../../app'
-import storageService from '../../services/storage.service'
-import tenantService from '../../services/tenant.service'
+import { container } from '../../ioc.container'
+import { StorageServiceType, StorageService } from '../../services/storage.service'
+import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service'
 
+chai.use(require('chai-http'))
 const { expect, request } = chai
+
+const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
+const storageService = container.get<StorageService>(StorageServiceType)
 
 describe('Tenants', () => {
   afterEach(async () => {

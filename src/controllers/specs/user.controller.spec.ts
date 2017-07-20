@@ -1,9 +1,13 @@
 import * as chai from 'chai'
 import app from '../../app'
-import tenantService from '../../services/tenant.service'
-import userService from '../../services/user.service'
+import { container } from '../../ioc.container'
+import { UserServiceType, UserServiceInterface } from '../../services/user.service'
+import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service'
 
 const { expect, request } = chai
+
+const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 let postRequest, delRequest, token, tenant
 

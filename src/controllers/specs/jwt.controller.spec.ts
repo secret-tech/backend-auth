@@ -1,13 +1,18 @@
 import * as chai from 'chai'
 
 import app from '../../app'
-import userService from '../../services/user.service'
-import keyService from '../../services/key.service'
-import storageService from '../../services/storage.service'
-import tenantService from '../../services/tenant.service'
+import { container } from '../../ioc.container'
+import { UserServiceType, UserServiceInterface } from '../../services/user.service'
+import { KeyServiceType, KeyServiceInterface } from '../../services/key.service'
+import { StorageServiceType, StorageService } from '../../services/storage.service'
+import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service'
 
 chai.use(require('chai-http'))
 
+const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
+const keyService = container.get<KeyServiceInterface>(KeyServiceType)
+const storageService = container.get<StorageService>(StorageServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 const { expect, request } = chai
 

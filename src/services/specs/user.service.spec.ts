@@ -1,6 +1,10 @@
+import { container } from '../../ioc.container'
 import { expect } from 'chai'
-import userService from '../user.service'
-import storageService from '../storage.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { UserServiceType, UserServiceInterface } from '../user.service'
+
+const storageService = container.get<StorageService>(StorageServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 describe('userService', () => {
   afterEach(async () => {
