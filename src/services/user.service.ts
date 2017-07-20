@@ -1,6 +1,7 @@
 import storage, { StorageService } from './storage.service'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
+import {log} from "util";
 
 
 /**
@@ -19,11 +20,11 @@ export class UserService {
   /**
    * Return user's data
    *
-   * @param  login  user's login (company + email)
+   * @param  key  user's key (tenant + login)
    * @return        promise
    */
-  get(login: string): Promise<string> {
-    return this.client.get(login)
+  get(key: string): Promise<string> {
+    return this.client.get(key)
   }
 
 
@@ -34,14 +35,14 @@ export class UserService {
    * @return promise
    */
   create(userData: any): Promise<any> {
-    const { email, tenant, password: passwordHash, scope, sub } = userData
+    const { email, tenant, login, password: passwordHash, scope, sub } = userData
 
-    if (!email || !passwordHash || !tenant || !sub) {
-      throw new Error('Email, password, tenant and sub are required parameters')
+    if (!email || !passwordHash || !tenant || !sub || !login) {
+      throw new Error('Email, password, tenant, login and sub are required parameters')
     }
 
     const password: string = bcrypt.hashSync(passwordHash)
-    const login: string = `${tenant}:${email}`
+    const key: string = this.getKey(tenant, login)
     const data: any = {
       id: uuid.v4(),
       login,
@@ -51,18 +52,22 @@ export class UserService {
       scope,
       sub,
     }
-    this.client.set(login, JSON.stringify(data))
+    this.client.set(key, JSON.stringify(data))
     return data
   }
 
   /**
    * Deletes user by login
    *
-   * @param login
+   * @param key
    * @return promise
    */
-  del(login: string): Promise<any> {
-    return this.client.del(login)
+  del(key: string): Promise<any> {
+    return this.client.del(key)
+  }
+
+  getKey(tenant: string, login: string) {
+    return `${tenant}:${login}`
   }
 }
 

@@ -54,6 +54,36 @@ export class JWTService {
 
 
   /**
+   * Generate tenant's token
+   *
+   * @param  tenant      user data object
+   * @param  sessionKey current user's session
+   * @param  userKey    user's unique key
+   * @param  issuedAt   time of creation
+   * @return  generated token
+   */
+  generateTenant(tenant: any, sessionKey: string, userKey: string, issuedAt: number): string {
+    const { id, login, } = tenant
+
+    if (!id || !login) {
+      throw new Error('tenant id and tenant login are required parameters')
+    }
+
+    const payload = {
+      id,
+      login,
+      jti: sessionKey,
+      iat: issuedAt,
+      aud: 'jincor.com'
+    }
+
+    const secret = this.generateSecret(userKey)
+
+    return jwt.sign(payload, secret, {algorithm: this.algorithm})
+  }
+
+
+  /**
    * Verify token
    *
    * @param  token  user's token

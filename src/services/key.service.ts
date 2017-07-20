@@ -52,6 +52,23 @@ export class KeyService {
     return token
   }
 
+  /**
+   * Generate and set tenant key
+   *
+   * @param  tenant       tenant's data
+   * @return            Promise
+   */
+  async setTenantToken(tenant: any): Promise<string> {
+    const userKey = uuid.v4()
+    const issuedAt = Date.now()
+
+    const key = this.tenantSessionKey(tenant.id, issuedAt)
+    const token = JWT.generateTenant(tenant, key, userKey, issuedAt)
+
+    await this.client.set(key, userKey)
+
+    return token
+  }
 
   /**
    * Delete user's key
@@ -74,6 +91,17 @@ export class KeyService {
    */
   private sessionKey(userId: string, deviceId: string, issuedAt: number): string {
     return userId + deviceId + issuedAt.toString()
+  }
+
+  /**
+   * Generate tenant session key
+   *
+   * @param  userId    user id
+   * @param  issuedAt  creation time
+   * @return           session key
+   */
+  private tenantSessionKey(userId: string, issuedAt: number): string {
+    return userId + issuedAt.toString()
   }
 }
 

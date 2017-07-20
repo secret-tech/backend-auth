@@ -1,10 +1,12 @@
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
+import { AuthorizedRequest } from '../requests/authorized.request'
 import * as bcrypt from 'bcrypt-nodejs'
 
 import jwtService from '../services/jwt.service'
 import keyService from '../services/key.service'
-import userService from '../services/user.service'
-import {JWTService} from '../services/jwt.service'
+import userService, {UserService} from '../services/user.service'
+import { JWTService } from '../services/jwt.service'
+import {log} from "util";
 
 
 /**
@@ -19,7 +21,7 @@ class JWTController {
    * @param  res  express res object
    * @param  next express next middleware function
    */
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async create(req: AuthorizedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { login, password, deviceId } = req.body
 
@@ -31,7 +33,8 @@ class JWTController {
         return
       }
 
-      const userStr = await userService.get(login)
+      const key = userService.getKey(req.tenant.id, login)
+      const userStr = await userService.get(key)
 
       if (!userStr) {
         res.status(404).send({
@@ -68,7 +71,7 @@ class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  async verify(req: Request, res: Response): Promise<void> {
+  async verify(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
     const isValid = await jwtService.verify(token)
 
@@ -88,7 +91,7 @@ class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  async logout(req: Request, res: Response): Promise<void> {
+  async logout(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
     const isValid = await jwtService.verify(token)
 
@@ -103,8 +106,8 @@ class JWTController {
     const result = await keyService.delete(decoded.jti)
 
     result
-        ? res.status(200).send({result: result})
-        : res.status(404).send({error: 'Session does not exist or has expired. Please sign in to continue.'})
+        ? res.status(200).send({ result: result })
+        : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' })
   }
 }
 

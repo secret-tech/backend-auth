@@ -7,6 +7,7 @@ import * as redis from 'redis'
 
 import jwtRoutes from './routes/jwt'
 import userRoutes from './routes/users'
+import tenantRoutes from './routes/tenant'
 
 const app: Application = express()
 
@@ -68,6 +69,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
  */
 app.use('/auth', jwtRoutes)
 app.use('/user', userRoutes)
+app.use('/tenant', tenantRoutes)
 
 /**
  * Respond with 404 if route was not found

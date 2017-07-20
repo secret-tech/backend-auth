@@ -11,7 +11,7 @@ describe('keyService', () => {
 
   describe('#set', () => {
     before(async () => {
-      const userData = { email: 'test', tenant: 'test', password: 'test', sub: '123', }
+      const userData = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123', }
       await userService.create(userData)
     })
 
@@ -21,7 +21,7 @@ describe('keyService', () => {
       const token = await keyService.set(user, 'test')
       const data = jwt.decode(token)
 
-      expect(data.login).to.equal('test:test')
+      expect(data.login).to.equal('test')
     })
   })
 
