@@ -1,13 +1,11 @@
-import { Response, NextFunction, RequestHandler } from 'express'
+import { Response, NextFunction } from 'express'
 import { AuthorizedRequest } from '../requests/authorized.request'
 import * as bcrypt from 'bcrypt-nodejs'
 
-import { JWTServiceType, JWTServiceInterface } from '../services/jwt.service'
 import { KeyServiceType, KeyServiceInterface } from '../services/key.service'
 import { UserServiceType, UserServiceInterface } from '../services/user.service'
 import { inject, injectable } from 'inversify'
 import { controller, httpPost } from 'inversify-express-utils'
-import 'reflect-metadata'
 
 /**
  * JWTController
@@ -19,12 +17,9 @@ import 'reflect-metadata'
 )
 export class JWTController {
   constructor(
-    @inject(JWTServiceType) private jwtService: JWTServiceInterface,
     @inject(KeyServiceType) private keyService: KeyServiceInterface,
     @inject(UserServiceType) private userService: UserServiceInterface,
-  ) {
-
-  }
+  ) { }
 
   /**
    * Generate and respond with token
@@ -87,16 +82,16 @@ export class JWTController {
   @httpPost('/verify')
   async verify(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
-    const isValid = await this.jwtService.verify(token)
+    const { valid, decoded } = await this.keyService.verifyToken(token)
 
-    if (!isValid) {
+    if (!valid) {
       res.status(400).send({
         error: 'invalid token'
       })
       return
     }
 
-    res.send({decoded: this.jwtService.decode(token)})
+    res.send({ decoded })
   }
 
   /**
@@ -108,16 +103,15 @@ export class JWTController {
   @httpPost('/logout')
   async logout(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
-    const isValid = await this.jwtService.verify(token)
+    const { valid, decoded } = await this.keyService.verifyToken(token)
 
-    if (!isValid) {
+    if (!valid) {
       res.status(400).send({
         error: 'invalid token'
       })
       return
     }
 
-    const decoded = this.jwtService.decode(token)
     const result = await this.keyService.del(decoded.jti)
 
     result

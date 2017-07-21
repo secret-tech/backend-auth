@@ -45,7 +45,7 @@ export class UserService implements UserServiceInterface {
    * @param userData user info
    * @return promise
    */
-  create(userData: any): Promise<any> {
+  async create(userData: any): Promise<any> {
     const { email, tenant, login, password: passwordHash, scope, sub } = userData
 
     if (!email || !passwordHash || !tenant || !sub || !login) {
@@ -63,7 +63,7 @@ export class UserService implements UserServiceInterface {
       scope,
       sub,
     }
-    this.storageService.set(key, JSON.stringify(data))
+    await this.storageService.set(key, JSON.stringify(data))
     return data
   }
 

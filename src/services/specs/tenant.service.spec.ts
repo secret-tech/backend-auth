@@ -1,11 +1,11 @@
 import { container } from '../../ioc.container'
 import { expect } from 'chai'
-import { JWTServiceType, JWTServiceInterface } from '../jwt.service'
+import { KeyServiceType, KeyServiceInterface } from '../key.service'
 import { StorageServiceType, StorageService } from '../storage.service'
 import { TenantServiceType, TenantServiceInterface } from '../tenant.service'
 
 
-const jwtService = container.get<JWTServiceInterface>(JWTServiceType)
+const keyService = container.get<KeyServiceInterface>(KeyServiceType)
 const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
 const storageService = container.get<StorageService>(StorageServiceType)
 
@@ -16,14 +16,14 @@ describe('tenantService', () => {
 
   describe('#create', () => {
     it('should create new tenant', async () => {
-      const tenant = { email: 'test@test.com', password: 'test', }
+      const tenant = { email: 'test@test.com', password: 'test' }
       const result = await tenantService.create(tenant)
 
       expect(result).to.be.a('object')
     })
 
     it('should require an email', async () => {
-      const tenant = { email: '', password: 'test', }
+      const tenant = { email: '', password: 'test' }
       let error: Error
 
       try {
@@ -52,13 +52,12 @@ describe('tenantService', () => {
 
   describe('#login', () => {
     it('should login tenant and return valid token', async () => {
-      const tenant = { email: 'test@test.com', password: 'test', }
+      const tenant = { email: 'test@test.com', password: 'test' }
       const result = await tenantService.create(tenant)
       const token = await tenantService.login(tenant)
 
-      const verified = await jwtService.verify(token)
-      expect(verified).to.be.equal(true)
+      const { valid } = await keyService.verifyToken(token)
+      expect(valid).to.be.equal(true)
     })
   })
 })
-

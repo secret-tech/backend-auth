@@ -1,18 +1,14 @@
 import { StorageService, StorageServiceType } from './storage.service'
 import * as uuid from 'node-uuid'
-import * as jwt from 'jsonwebtoken'
-import config from '../config'
-import {inject, injectable} from 'inversify'
-import 'reflect-metadata'
-const { algorithm, secret_separator, secret } = config.jwt
-
-const { expires_seconds: EXPIRATION_TIME } = config.key_service
+import { inject, injectable } from 'inversify'
+import { JWTServiceType, JWTServiceInterface } from './jwt.service'
 
 export interface KeyServiceInterface {
   get: (key: string) => Promise<string>
   set: (user: any, deviceId: string) => Promise<string>
   setTenantToken: (tenant: any) => Promise<string>
   del: (key: string) => Promise<any>
+  verifyToken: (token: string) => Promise<any>
 }
 
 /**
@@ -24,9 +20,11 @@ export class KeyService implements KeyServiceInterface {
    * constructor
    *
    * @param  client  redis client
+   * @param  jwtService JWT service
    */
   constructor(
     @inject(StorageServiceType) private client: StorageService,
+    @inject(JWTServiceType) private jwtService: JWTServiceInterface,
   ) { }
 
 
@@ -53,10 +51,10 @@ export class KeyService implements KeyServiceInterface {
     const issuedAt = Date.now()
 
     const key = this.sessionKey(user.id, deviceId, issuedAt)
-    const token = this.generate(user, deviceId, key, userKey, issuedAt, EXPIRATION_TIME)
+    const { token, expiresIn } = this.jwtService.generateUserToken(user, deviceId, key, userKey, issuedAt)
 
     await this.client.set(key, userKey)
-    await this.client.expire(key, EXPIRATION_TIME)
+    await this.client.expire(key, expiresIn)
 
     return token
   }
@@ -72,7 +70,7 @@ export class KeyService implements KeyServiceInterface {
     const issuedAt = Date.now()
 
     const key = this.tenantSessionKey(tenant.id, issuedAt)
-    const token = this.generateTenant(tenant, key, userKey, issuedAt)
+    const token = this.jwtService.generateTenantToken(tenant, key, userKey, issuedAt)
 
     await this.client.set(key, userKey)
 
@@ -89,6 +87,17 @@ export class KeyService implements KeyServiceInterface {
     return this.client.del(key)
   }
 
+  async verifyToken(token: string): Promise<any> {
+    const decoded = this.jwtService.decode(token)
+
+    if (!decoded) {
+      return { valid: false }
+    }
+
+    const userKey = await this.get(decoded.jti)
+    const valid = await this.jwtService.verify(token, userKey)
+    return { valid, decoded }
+  }
 
   /**
    * Generate session key
@@ -111,80 +120,6 @@ export class KeyService implements KeyServiceInterface {
    */
   private tenantSessionKey(userId: string, issuedAt: number): string {
     return userId + issuedAt.toString()
-  }
-
-  /**
-   * Generate user's token
-   *
-   * @param  user       user data object
-   * @param  deviceId   device id
-   * @param  sessionKey current user's session
-   * @param  userKey    user's unique key
-   * @param  issuedAt   time of creation
-   * @param  expiresIn  expiration time
-   * @return  generated token
-   */
-  generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string {
-    const { id, login, scope, sub } = user
-
-    if (!id || !login || !sub) {
-      throw new Error('user.id and user.login are required parameters')
-    }
-
-    const payload = {
-      id,
-      login,
-      scope,
-      deviceId,
-      jti: sessionKey,
-      iat: issuedAt,
-      sub,
-      aud: 'jincor.com'
-    }
-
-    const secret = this.generateSecret(userKey)
-
-    return jwt.sign(payload, secret, {algorithm: algorithm, expiresIn})
-  }
-
-
-  /**
-   * Generate tenant's token
-   *
-   * @param  tenant      user data object
-   * @param  sessionKey current user's session
-   * @param  userKey    user's unique key
-   * @param  issuedAt   time of creation
-   * @return  generated token
-   */
-  generateTenant(tenant: any, sessionKey: string, userKey: string, issuedAt: number): string {
-    const { id, login, } = tenant
-
-    if (!id || !login) {
-      throw new Error('tenant id and tenant login are required parameters')
-    }
-
-    const payload = {
-      id,
-      login,
-      jti: sessionKey,
-      iat: issuedAt,
-      aud: 'jincor.com'
-    }
-
-    const secret = this.generateSecret(userKey)
-
-    return jwt.sign(payload, secret, {algorithm: algorithm})
-  }
-
-  /**
-   * Generate secret key
-   *
-   * @param  userKey  unique user's key
-   * @return generated secret
-   */
-  private generateSecret(userKey: string): string {
-    return secret + secret_separator + userKey
   }
 }
 

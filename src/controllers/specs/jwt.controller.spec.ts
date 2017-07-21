@@ -19,6 +19,10 @@ const { expect, request } = chai
 let postRequest, token, tenant
 
 describe('Authenticate', () => {
+  afterEach(async () => {
+    await storageService.flushdb()
+  })
+
   beforeEach(async () => {
     const params = { email: 'test@test.com', password: 'test', }
     tenant = await tenantService.create(params)
@@ -33,10 +37,6 @@ describe('Authenticate', () => {
   })
 
   describe('POST /auth', () => {
-    afterEach(async () => {
-      await storageService.flushdb()
-    })
-
     it('should return 404', (done) => {
       const params = { login: 'test:test', password: 'test', deviceId: 'test' }
 
@@ -76,10 +76,6 @@ describe('Authenticate', () => {
   })
 
   describe('POST /auth/logout', () => {
-    afterEach(async () => {
-      await storageService.flushdb()
-    })
-
     it('should logout', (done) => {
       const user = {
         id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
@@ -109,10 +105,6 @@ describe('Authenticate', () => {
   })
 
   describe('POST /auth/verify', () => {
-    after(async () => {
-      await storageService.flushdb()
-    })
-
     it('should be valid token', (done) => {
       const user = {
         id: 'a50e5d6b-1037-4e99-9fa3-f555f1df0bd6',
@@ -139,5 +131,4 @@ describe('Authenticate', () => {
       })
     })
   })
-
 })

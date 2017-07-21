@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { TenantServiceType, TenantServiceInterface } from '../services/tenant.service'
 import { KeyServiceInterface, KeyServiceType } from '../services/key.service'
-import { JWTServiceType, JWTServiceInterface } from '../services/jwt.service'
 import { inject, injectable } from 'inversify'
 import { controller, httpPost } from 'inversify-express-utils'
 
@@ -11,19 +10,10 @@ import { controller, httpPost } from 'inversify-express-utils'
 @injectable()
 @controller('/tenant')
 export class TenantController {
-  private tenantService: TenantServiceInterface
-  private keyService: KeyServiceInterface
-  private jwtService: JWTServiceInterface
-
   constructor (
-    @inject(TenantServiceType) tenantService: TenantServiceInterface,
-    @inject(KeyServiceType) keyService: KeyServiceInterface,
-    @inject(JWTServiceType) jwtService: JWTServiceInterface,
-  ) {
-    this.tenantService = tenantService
-    this.keyService = keyService
-    this.jwtService = jwtService
-  }
+    @inject(TenantServiceType) private tenantService: TenantServiceInterface,
+    @inject(KeyServiceType) private keyService: KeyServiceInterface,
+  ) { }
 
   /**
    * Create tenant
@@ -43,9 +33,14 @@ export class TenantController {
       return
     }
 
-    const result = await this.tenantService.create({ email, password })
-
-    res.json(result)
+    try {
+      const result = await this.tenantService.create({email, password})
+      res.json(result)
+    } catch (e) {
+      res.status(400).json({
+        error: e.message
+      })
+    }
   }
 
   /**
@@ -82,16 +77,15 @@ export class TenantController {
   @httpPost('/logout')
   async logout(req: Request, res: Response): Promise<void> {
     const { token } = req.body
-    const isValid = await this.jwtService.verify(token)
+    const { valid, decoded } = await this.keyService.verifyToken(token)
 
-    if (!isValid) {
+    if (!valid) {
       res.status(400).send({
         error: 'invalid token'
       })
       return
     }
 
-    const decoded = this.jwtService.decode(token)
     const result = await this.keyService.del(decoded.jti)
 
     result

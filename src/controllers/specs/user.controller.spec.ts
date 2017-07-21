@@ -3,16 +3,22 @@ import app from '../../app'
 import { container } from '../../ioc.container'
 import { UserServiceType, UserServiceInterface } from '../../services/user.service'
 import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service'
+import { StorageServiceType, StorageService } from '../../services/storage.service'
 
 const { expect, request } = chai
 
 const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
 const userService = container.get<UserServiceInterface>(UserServiceType)
+const storageService = container.get<StorageService>(StorageServiceType)
 
 let postRequest, delRequest, token, tenant
 
 describe('Users', () => {
-  before(async () => {
+  afterEach(async () => {
+    await storageService.flushdb()
+  })
+
+  beforeEach(async () => {
     const params = { email: 'test@test.com', password: 'test', }
     tenant = await tenantService.create(params)
     token = await tenantService.login(params)
@@ -44,8 +50,6 @@ describe('Users', () => {
   })
 
   describe('DELETE /user', () => {
-    let login
-
     before(async () => {
       delRequest = (url: string) => {
         return request(app)
@@ -53,17 +57,16 @@ describe('Users', () => {
           .set('Accept', 'application/json')
           .set('Authorization', 'Bearer ' + token)
       }
-
-      const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test',  sub: '123', }
-      const userData = await userService.create(params)
-      login = userData.login
     })
 
     it('should delete user', (done) => {
-      delRequest(`/user/${login}`).end((err, res) => {
-        expect(res.status).to.equal(200)
-        expect(res.body.result).to.equal(1)
-        done()
+      const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test',  sub: '123', }
+      const userData = userService.create(params).then((userData) => {
+        delRequest(`/user/${userData.login}`).end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(res.body.result).to.equal(1)
+          done()
+        })
       })
     })
 

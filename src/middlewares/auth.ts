@@ -1,16 +1,13 @@
 import { Response, NextFunction } from 'express'
 import { AuthorizedRequest } from '../requests/authorized.request'
-import { JWTServiceType, JWTServiceInterface } from '../services/jwt.service'
-import { container } from '../ioc.container'
+import { KeyServiceInterface } from '../services/key.service'
 
 export class Auth {
-  jwtService
-
   /**
    * constructor
    */
-  constructor() {
-    this.jwtService = container.get<JWTServiceInterface>(JWTServiceType)
+  constructor(private keyService: KeyServiceInterface) {
+    this.keyService = keyService
   }
 
   async authenticate(req: AuthorizedRequest, res: Response, next: NextFunction) {
@@ -30,15 +27,15 @@ export class Auth {
 
     const token = parts[1]
 
-    const verify = await this.jwtService.verify(token)
+    const { valid, decoded } = await this.keyService.verifyToken(token)
 
-    if (!verify) {
+    if (!valid || !decoded.isTenant) {
       return res.status(401).json({
         error: 'Not Authorized'
       })
     }
 
-    req.tenant = this.jwtService.decode(token)
+    req.tenant = decoded
     return next()
   }
 }

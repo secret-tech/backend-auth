@@ -28,9 +28,30 @@ describe('Tenants', () => {
       })
     })
 
+    it('should not create tenant when email already exists', (done) => {
+      const params = { email: 'test@test.com', password: 'test' }
+      request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
+        request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
+          expect(res.status).to.equal(400)
+          expect(res.body.error).to.equal('This tenant\'s email already exists')
+          done()
+        })
+      })
+    })
+
     it('should require email and password', (done) => {
       request(app).post('/tenant').set('Accept', 'application/json').send({}).end((err, res) => {
         expect(res.status).to.equal(400)
+        done()
+      })
+    })
+
+    it('should validate email ', (done) => {
+      const params = { email: 'test.test.com', password: 'test' }
+
+      request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
+        expect(res.status).to.equal(400)
+        expect(res.body.error).to.equal('Email is invalid')
         done()
       })
     })
@@ -92,24 +113,26 @@ describe('Tenants', () => {
 
   describe('POST /tenant/logout', () => {
     it('should logout', (done) => {
-      const tenant = { email: 'test@test.com', password: 'test' }
-      tenantService.create(tenant)
-      tenantService.login(tenant).then((token) => {
-        request(app).post('/tenant/logout').set('Accept', 'application/json').send({ token }).end((err, res) => {
-          expect(res.status).to.equal(200)
-          expect(res.body.result).to.equal(1)
-          done()
+      const tenant = {email: 'test@test.com', password: 'test'}
+      tenantService.create(tenant).then(() => {
+        tenantService.login(tenant).then((token) => {
+          request(app).post('/tenant/logout').set('Accept', 'application/json').send({token}).end((err, res) => {
+            expect(res.status).to.equal(200)
+            expect(res.body.result).to.equal(1)
+            done()
+          })
         })
       })
     })
 
     it('should respond with error for incorrect token', (done) => {
-      const tenant = { email: 'test@test.com', password: 'test' }
-      tenantService.create(tenant)
-      tenantService.login(tenant).then((token) => {
-        request(app).post('/tenant/logout').set('Accept', 'application/json').send({ token: token + '1' }).end((err, res) => {
-          expect(res.status).to.equal(400)
-          done()
+      const tenant = {email: 'test@test.com', password: 'test'}
+      tenantService.create(tenant).then(() => {
+        tenantService.login(tenant).then((token) => {
+          request(app).post('/tenant/logout').set('Accept', 'application/json').send({token: token + '1'}).end((err, res) => {
+            expect(res.status).to.equal(400)
+            done()
+          })
         })
       })
     })

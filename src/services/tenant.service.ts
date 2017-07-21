@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt-nodejs'
 import { KeyServiceInterface, KeyServiceType } from './key.service'
 import { injectable, inject } from 'inversify'
 import 'reflect-metadata'
+const EMAIL_REGEXP = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
 export interface TenantServiceInterface {
   get: (key: string) => Promise<string>
@@ -16,8 +17,6 @@ export interface TenantServiceInterface {
  */
 @injectable()
 export class TenantService implements TenantServiceInterface {
-  private client: StorageService
-  private keyService: KeyServiceInterface
   /**
    * constructor
    *
@@ -25,12 +24,9 @@ export class TenantService implements TenantServiceInterface {
    * @param  keyService key service
    */
   constructor(
-    @inject(StorageServiceType) client: StorageService,
-    @inject(KeyServiceType) keyService: KeyServiceInterface
-  ) {
-    this.client = client
-    this.keyService = keyService
-  }
+    @inject(StorageServiceType) private client: StorageService,
+    @inject(KeyServiceType) private keyService: KeyServiceInterface
+  ) { }
 
 
   /**
@@ -50,15 +46,25 @@ export class TenantService implements TenantServiceInterface {
    * @param userData user info
    * @return promise
    */
-  create(userData: any): Promise<any> {
+  async create(userData: any): Promise<any> {
     const { email, password } = userData
 
     if (!email || !password) {
       throw new Error('Email and password are required parameters')
     }
 
+    if (!EMAIL_REGEXP.test(email)) {
+      throw new Error('Email is invalid')
+    }
+
     const passwordHash = bcrypt.hashSync(password)
     const login: string = `tenant:${email}`
+
+    const exists = await this.get(login)
+    if (exists) {
+      throw new Error('This tenant\'s email already exists')
+    }
+
     const data: any = {
       id: uuid.v4(),
       login,

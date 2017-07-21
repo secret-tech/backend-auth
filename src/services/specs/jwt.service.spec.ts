@@ -1,11 +1,9 @@
 import { expect } from 'chai'
 
-import { KeyServiceInterface, KeyServiceType} from '../key.service'
 import { JWTServiceType, JWTServiceInterface } from '../jwt.service'
 import { container } from '../../ioc.container'
 
 const jwtService = container.get<JWTServiceInterface>(JWTServiceType)
-const keyService = container.get<KeyServiceInterface>(KeyServiceType)
 
 describe('jwtService', () => {
   describe('#generate', () => {
@@ -15,7 +13,7 @@ describe('jwtService', () => {
         login: 'test:test',
         sub: '123',
       }
-      const token = jwtService.generate(user, 'device_id', 'key', 'user_key', Date.now(), 60)
+      const token = jwtService.generateUserToken(user, 'device_id', 'key', 'user_key', Date.now(), 60)
 
       expect(token).to.exist
     })
@@ -29,7 +27,7 @@ describe('jwtService', () => {
       let error: Error
 
       try {
-        jwtService.generate(user, 'device_id', 'key', 'user_key', Date.now(), 60)
+        jwtService.generateUserToken(user, 'device_id', 'key', 'user_key', Date.now(), 60)
       } catch (e) {
         error = e
       }
@@ -48,14 +46,14 @@ describe('jwtService', () => {
         company: 'test',
         sub: '123',
       }
-      const token = await keyService.set(user, 'test')
-      const isValid = await jwtService.verify(token)
+      const { token } = await jwtService.generateUserToken(user, 'test', 'sessionKey', 'userKey', Date.now())
+      const isValid = await jwtService.verify(token, 'userKey')
 
       expect(isValid).to.be.true
     })
 
     it('should verify token', async () => {
-      const isValid = await jwtService.verify('invalid_token')
+      const isValid = await jwtService.verify('invalid_token', 'userKey')
 
       expect(isValid).to.be.false
     })
