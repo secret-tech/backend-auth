@@ -1,24 +1,31 @@
-import storage, { StorageService } from './storage.service'
+import { StorageService, StorageServiceType } from './storage.service'
 import * as uuid from 'node-uuid'
+import { inject, injectable } from 'inversify'
+import { JWTServiceType, JWTServiceInterface } from './jwt.service'
 
-import JWT from './jwt.service'
-import config from '../config'
-
-
-const { expires_seconds: EXPIRATION_TIME } = config.key_service
-
+export interface KeyServiceInterface {
+  get: (key: string) => Promise<string>
+  set: (user: any, deviceId: string) => Promise<string>
+  setTenantToken: (tenant: any) => Promise<string>
+  del: (key: string) => Promise<any>
+  verifyToken: (token: string) => Promise<any>
+}
 
 /**
  * KeyService
  */
-export class KeyService {
-
+@injectable()
+export class KeyService implements KeyServiceInterface {
   /**
    * constructor
    *
    * @param  client  redis client
+   * @param  jwtService JWT service
    */
-  constructor(private client: StorageService) {}
+  constructor(
+    @inject(StorageServiceType) private client: StorageService,
+    @inject(JWTServiceType) private jwtService: JWTServiceInterface,
+  ) { }
 
 
   /**
@@ -44,14 +51,31 @@ export class KeyService {
     const issuedAt = Date.now()
 
     const key = this.sessionKey(user.id, deviceId, issuedAt)
-    const token = JWT.generate(user, deviceId, key, userKey, issuedAt, EXPIRATION_TIME)
+    const { token, expiresIn } = this.jwtService.generateUserToken(user, deviceId, key, userKey, issuedAt)
 
     await this.client.set(key, userKey)
-    await this.client.expire(key, EXPIRATION_TIME)
+    await this.client.expire(key, expiresIn)
 
     return token
   }
 
+  /**
+   * Generate and set tenant key
+   *
+   * @param  tenant       tenant's data
+   * @return            Promise
+   */
+  async setTenantToken(tenant: any): Promise<string> {
+    const userKey = uuid.v4()
+    const issuedAt = Date.now()
+
+    const key = this.tenantSessionKey(tenant.id, issuedAt)
+    const token = this.jwtService.generateTenantToken(tenant, key, userKey, issuedAt)
+
+    await this.client.set(key, userKey)
+
+    return token
+  }
 
   /**
    * Delete user's key
@@ -59,10 +83,21 @@ export class KeyService {
    * @param  key  session id
    * @return      Promise
    */
-  delete(key: string): Promise<any> {
+  del(key: string): Promise<any> {
     return this.client.del(key)
   }
 
+  async verifyToken(token: string): Promise<any> {
+    const decoded = this.jwtService.decode(token)
+
+    if (!decoded) {
+      return { valid: false }
+    }
+
+    const userKey = await this.get(decoded.jti)
+    const valid = await this.jwtService.verify(token, userKey)
+    return { valid, decoded }
+  }
 
   /**
    * Generate session key
@@ -75,6 +110,18 @@ export class KeyService {
   private sessionKey(userId: string, deviceId: string, issuedAt: number): string {
     return userId + deviceId + issuedAt.toString()
   }
+
+  /**
+   * Generate tenant session key
+   *
+   * @param  userId    user id
+   * @param  issuedAt  creation time
+   * @return           session key
+   */
+  private tenantSessionKey(userId: string, issuedAt: number): string {
+    return userId + issuedAt.toString()
+  }
 }
 
-export default new KeyService(storage)
+const KeyServiceType = Symbol('KeyServiceInterface')
+export { KeyServiceType }

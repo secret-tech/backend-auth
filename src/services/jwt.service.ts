@@ -1,22 +1,32 @@
 import config from '../config'
 import * as jwt from 'jsonwebtoken'
-import KeyService from './key.service'
+import { injectable } from 'inversify'
 
-const { algorithm, secret_separator, secret } = config.jwt
+const { algorithm, secret_separator, secret, expiration } = config.jwt
+
+export interface JWTServiceInterface {
+  generateUserToken: (user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number) => any
+  generateTenantToken: (tenant: any, sessionKey: string, userKey: string, issuedAt: number) => string
+  verify: (token: string, userKey: string) => Promise<boolean>
+  decode: (token: string) => any
+}
 
 /**
  *  JWT service
  */
-export class JWTService {
-
+@injectable()
+export class JWTService implements JWTServiceInterface {
+  private secret: string
+  private algorithm: string
+  private secret_separator: string
   /**
    * Creates jwt service instance
-   *
-   * @param  secret           secret key
-   * @param  algorithm        encrypted algorithm
-   * @param  secret_separator secret seporator
    */
-  constructor(private secret: string, private algorithm: string, private secret_separator: string) {}
+  constructor() {
+    this.secret = secret
+    this.algorithm = algorithm
+    this.secret_separator = secret_separator
+  }
 
   /**
    * Generate user's token
@@ -29,11 +39,15 @@ export class JWTService {
    * @param  expiresIn  expiration time
    * @return  generated token
    */
-  generate(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn: number): string {
+  generateUserToken(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number): any {
     const { id, login, scope, sub } = user
 
     if (!id || !login || !sub) {
       throw new Error('user.id and user.login are required parameters')
+    }
+
+    if (!expiresIn) {
+      expiresIn = expiration
     }
 
     const payload = {
@@ -48,8 +62,39 @@ export class JWTService {
     }
 
     const secret = this.generateSecret(userKey)
+    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
+    return { token, expiresIn }
+  }
 
-    return jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
+
+  /**
+   * Generate tenant's token
+   *
+   * @param  tenant      user data object
+   * @param  sessionKey current user's session
+   * @param  userKey    user's unique key
+   * @param  issuedAt   time of creation
+   * @return  generated token
+   */
+  generateTenantToken(tenant: any, sessionKey: string, userKey: string, issuedAt: number): string {
+    const { id, login, } = tenant
+
+    if (!id || !login) {
+      throw new Error('tenant id and tenant login are required parameters')
+    }
+
+    const payload = {
+      id,
+      login,
+      jti: sessionKey,
+      iat: issuedAt,
+      aud: 'jincor.com',
+      isTenant: true
+    }
+
+    const secret = this.generateSecret(userKey)
+
+    return jwt.sign(payload, secret, {algorithm: this.algorithm})
   }
 
 
@@ -57,16 +102,10 @@ export class JWTService {
    * Verify token
    *
    * @param  token  user's token
+   * @param  userKey  user's session key
    * @return  promise
    */
-  async verify(token: string): Promise<boolean> {
-    const decoded = jwt.decode(token)
-
-    if (!decoded) {
-      return false
-    }
-
-    const userKey = await KeyService.get(decoded.jti)
+  async verify(token: string, userKey: string): Promise<boolean> {
     const secret = this.generateSecret(userKey)
 
     try {
@@ -77,7 +116,7 @@ export class JWTService {
     }
   }
 
-  static decode(token: string): any {
+  decode(token: string): any {
     return jwt.decode(token)
   }
 
@@ -93,4 +132,5 @@ export class JWTService {
   }
 }
 
-export default new JWTService(secret, algorithm, secret_separator)
+const JWTServiceType = Symbol('JWTServiceInterface')
+export { JWTServiceType }

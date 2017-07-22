@@ -5,18 +5,75 @@ HOST: http://auth:3000/
 
 Jincor Auth is a service that manages JWT-authentication, it's main responsibilities are:
 
-1. Users management.
-2. Generation of JWT tokens.
-3. Validation of JWT tokens.
+1. Tenants management.
+2. Users management.
+3. Generation of JWT tokens.
+4. Validation of JWT tokens.
 
 
 Common workflow is following:
 
-1. Create a user.
-2. Login the user, save received token.
-3. Verify saved token whenever authentication required.
-4. Logout the user when necessary.
-5. Delete the user when his account is not active anymore or deleted.
+1. Register a tenant. Tenant is expected to be a service which requires authentication.
+2. Login tenant. Save received token. Use this token further to manage your tenant's users. Make sure that your end users DO NOT have access to this token!
+3. Create a user when he registers at your service.
+4. Login the user when he logins at your service, save received token on user's side (Browser local storage, etc.).
+5. Verify saved token whenever authentication required.
+6. Logout the user when necessary.
+7. Delete the user when his account is not active anymore or deleted.
+8. Logout your tenant's session when you stop using your service or need to deactivate tenant token for some reason.
+
+# Group Tenant
+
+## Register tenant [/tenant]
+
+### Register new tenant [POST]
+
++ Request (application/json)
+
+        {
+            "email": "test@test.com",
+            "password": "password"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+            "email": "test@test.com",
+        }
+
+## Login tenant to create new JWT token [/tenant/login]
+
+### Login tenant [POST]
+
++ Request (application/json)
+
+        {
+            "email": "test@test.com",
+            "password": "password"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "accessToken": "jwt_token"
+        }
+
+## Login tenant to invalidate JWT token [/tenant/logout]
+
+### Logout tenant [POST]
+
++ Request (application/json)
+
+        {
+            "accessToken": "jwt_token"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "result": 1
+        }
 
 # Group User
 

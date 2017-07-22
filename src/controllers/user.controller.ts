@@ -1,11 +1,24 @@
-import { Request, Response } from 'express'
-import userService from '../services/user.service'
-
+import { Response } from 'express'
+import { AuthorizedRequest } from '../requests/authorized.request'
+import { UserServiceType, UserServiceInterface } from '../services/user.service'
+import { inject, injectable } from 'inversify'
+import {controller, httpDelete, httpPost} from 'inversify-express-utils'
+import 'reflect-metadata'
 
 /**
  * UserController
  */
-class UserController {
+@injectable()
+@controller(
+  '/user',
+  'AuthMiddleware'
+)
+export class UserController {
+  private userService: UserServiceInterface
+
+  constructor(@inject(UserServiceType) userService: UserServiceInterface) {
+    this.userService = userService
+  }
 
   /**
    * Create user
@@ -13,10 +26,11 @@ class UserController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  async create(req: Request, res: Response): Promise<void> {
-    const { email, tenant, password, scope, sub } = req.body
+  @httpPost('/')
+  async create(req: AuthorizedRequest, res: Response): Promise<void> {
+    const { email, login, password, scope, sub } = req.body
 
-    if (!email || !password || !sub || !tenant) {
+    if (!email || !password || !sub || !login) {
       res.status(400).send({
         error: 'email, password, tenant and sub are required parameters',
         status: 400
@@ -24,7 +38,7 @@ class UserController {
       return
     }
 
-    const result = await userService.create({ email, password, tenant, scope, sub })
+    const result = await this.userService.create({ email, login, password, tenant: req.tenant.id, scope, sub })
 
     res.json(result)
   }
@@ -35,7 +49,8 @@ class UserController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  async del(req: Request, res: Response): Promise<void> {
+  @httpDelete('/:login')
+  async del(req: AuthorizedRequest, res: Response): Promise<void> {
     const { login } = req.params
 
     if (!login) {
@@ -45,12 +60,11 @@ class UserController {
       return
     }
 
-    const result = await userService.del(login)
+    const key = this.userService.getKey(req.tenant.id, login)
+    const result = await this.userService.del(key)
 
     result
         ? res.status(200).send({result: 1})
         : res.status(404).send({error: 'Specified login does not exist or was already deleted.'})
   }
 }
-
-export default UserController

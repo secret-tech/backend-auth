@@ -1,9 +1,7 @@
 import * as express from 'express'
 import { Response, Request, NextFunction, Application } from 'express'
 import * as chai from 'chai'
-import * as redis from 'redis'
 import { RequestThrottler } from '../request.throttler'
-import config from '../../config'
 
 const { expect, request } = chai
 
@@ -20,11 +18,7 @@ describe('Request Throttler', () => {
 
       const app: Application = express()
 
-      const {redis: {port, host}} = config
-
-      const redisClient = redis.createClient(port, host)
-
-      const requestThrottler = new RequestThrottler(redisClient, options)
+      const requestThrottler = new RequestThrottler(options)
 
       app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next))
 
@@ -51,11 +45,7 @@ describe('Request Throttler', () => {
 
       const app: Application = express()
 
-      const {redis: {port, host}} = config
-
-      const redisClient = redis.createClient(port, host)
-
-      const requestThrottler = new RequestThrottler(redisClient, options)
+      const requestThrottler = new RequestThrottler(options)
 
       app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next))
 
