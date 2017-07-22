@@ -1,5 +1,8 @@
 import { expect } from 'chai'
-import storageService from '../storage.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { container } from '../../ioc.container'
+
+const storageService = container.get<StorageService>(StorageServiceType)
 
 describe('storageService', () => {
   afterEach(async () => {

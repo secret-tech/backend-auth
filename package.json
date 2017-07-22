@@ -9,15 +9,26 @@
     "build": "tsc --outDir dist src/bin/www",
     "serve": "node ./dist/bin/www.js"
   },
+  "nyc": {
+    "exclude": [
+      "src/**/*.spec.ts"
+    ]
+  },
   "dependencies": {
+    "@types/joi": "10.4.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.15.2",
     "debug": "~2.2.0",
     "es6-promise": "4.0.5",
     "express": "~4.14.0",
+    "inversify": "4.2.0",
+    "inversify-express-utils": "4.0.0",
+    "joi": "10.6.0",
     "jsonwebtoken": "^7.2.1",
     "node-uuid": "^1.4.7",
-    "redis": "2.6.3"
+    "redis": "2.6.3",
+    "reflect-metadata": "0.1.10",
+    "rolling-rate-limiter": "0.1.9"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "0.0.30",

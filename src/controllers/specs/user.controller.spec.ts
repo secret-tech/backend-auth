@@ -1,49 +1,136 @@
 import * as chai from 'chai'
-
 import app from '../../app'
-
+import { container } from '../../ioc.container'
+import { UserServiceType, UserServiceInterface } from '../../services/user.service'
+import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service'
+import { StorageServiceType, StorageService } from '../../services/storage.service'
 
 const { expect, request } = chai
 
-describe('Users', () => {
-  describe('POST /user', () => {
-    it('should create user', async () => {
-      const params = { email: 'test', tenant: 'test', password: 'test' }
-      const res = await request(app).post('/user').send(params)
+const tenantService = container.get<TenantServiceInterface>(TenantServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
+const storageService = container.get<StorageService>(StorageServiceType)
 
-      expect(res.status).to.equal(200)
+let postRequest, delRequest, token, tenant
+
+describe('Users', () => {
+  afterEach(async () => {
+    await storageService.flushdb()
+  })
+
+  beforeEach(async () => {
+    const params = { email: 'test@test.com', password: 'testA6', }
+    tenant = await tenantService.create(params)
+    token = await tenantService.login(params)
+  })
+
+  describe('POST /user', () => {
+    before(async () => {
+      postRequest = (url: string) => {
+        return request(app)
+          .post(url)
+          .set('Accept', 'application/json')
+          .set('Authorization', 'Bearer ' + token)
+      }
     })
 
-    it('should require email and password', async () => {
-      let res: any
-      try {
-        res = await request(app).post('/user').send({})
-      } catch (e) {
-        res = e
-      }
-      expect(res.status).to.equal(400)
+    it('should create user', (done) => {
+      const params = { email: 'test@test.com', login: 'test', password: 'test', sub: '123', }
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(200)
+        done()
+      })
+    })
+
+    it('should validate email', (done) => {
+      const params = { email: 'test.test.com', login: 'test', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"email" must be a valid email')
+        done()
+      })
+    })
+
+    it('should require email', (done) => {
+      const params = { login: 'test', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"email" is required')
+        done()
+      })
+    })
+
+    it('should require login', (done) => {
+      const params = { email: 'test@test.com', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"login" is required')
+        done()
+      })
+    })
+
+    it('should require password', (done) => {
+      const params = { email: 'test@test.com', login: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"password" is required')
+        done()
+      })
+    })
+
+    it('should require sub', (done) => {
+      const params = { email: 'test@test.com', login: 'test', password: 'test', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"sub" is required')
+        done()
+      })
     })
   })
 
   describe('DELETE /user', () => {
-    it('should delete user', async () => {
-      const params = { email: 'test', tenant: 'test', password: 'test' }
-      const create = await request(app).post('/user').send(params)
-
-      const login = create.body.login
-      const res = await request(app).del(`/user/${login}`)
-      expect(res.status).to.equal(200)
-      expect(res.body.result).to.equal(1)
+    before(async () => {
+      delRequest = (url: string) => {
+        return request(app)
+          .del(url)
+          .set('Accept', 'application/json')
+          .set('Authorization', 'Bearer ' + token)
+      }
     })
 
-    it('should respond with 404 code if login is not found', async () => {
-      let res: any
-      try {
-        res = await request(app).del('/user/123')
-      } catch (e) {
-        res = e
-      }
-      expect(res.status).to.equal(404)
+    it('should delete user', (done) => {
+      const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test',  sub: '123', }
+      const userData = userService.create(params).then((userData) => {
+        delRequest(`/user/${userData.login}`).end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(res.body.result).to.equal(1)
+          done()
+        })
+      })
+    })
+
+    it('should respond with 404 code if login is not found', (done) => {
+      delRequest('/user/123').end((err, res) => {
+        expect(res.status).to.equal(404)
+        done()
+      })
+    })
+
+    it('should require login', (done) => {
+      delRequest('/user/').end((err, res) => {
+        expect(res.status).to.equal(404) // 404 because no matching route is found, so validation does not make sense here
+        done()
+      })
     })
   })
 })

@@ -1,8 +1,13 @@
 import { expect } from 'chai'
 import * as jwt from 'jsonwebtoken'
-import storageService from '../storage.service'
-import keyService from '../key.service'
-import userService from '../user.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { KeyServiceInterface, KeyServiceType } from '../key.service'
+import { UserServiceType, UserServiceInterface } from '../user.service'
+import { container } from '../../ioc.container'
+
+const storageService = container.get<StorageService>(StorageServiceType)
+const keyService = container.get<KeyServiceInterface>(KeyServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 describe('keyService', () => {
   afterEach(async () => {
@@ -11,7 +16,7 @@ describe('keyService', () => {
 
   describe('#set', () => {
     before(async () => {
-      const userData = { email: 'test', tenant: 'test', password: 'test' }
+      const userData = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123', }
       await userService.create(userData)
     })
 
@@ -21,7 +26,7 @@ describe('keyService', () => {
       const token = await keyService.set(user, 'test')
       const data = jwt.decode(token)
 
-      expect(data.login).to.equal('test:test')
+      expect(data.login).to.equal('test')
     })
   })
 
@@ -34,7 +39,8 @@ describe('keyService', () => {
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        tenant: 'test'
+        tenant: 'test',
+        sub: '123',
       }
       const token = await keyService.set(user, 'test')
       sessionKey = jwt.decode(token).jti
@@ -56,16 +62,17 @@ describe('keyService', () => {
         login: 'test:test',
         password: '$2a$10$V5o4Ezdqcbip1uzFRlxgFu77dwJGYhwlGwM2W66JqSN3AUFwPpKRO',
         email: 'test',
-        company: 'test'
+        tenant: 'test',
+        sub: '123',
       }
       const token = await keyService.set(user, 'test')
       sessionKey = jwt.decode(token).jti
     })
 
     it('should delete session', async () => {
-      const userKey = await keyService.delete(sessionKey)
+      const result = await keyService.del(sessionKey)
 
-      expect(userKey).to.equal(1)
+      expect(result).to.equal(1)
     })
   })
 })

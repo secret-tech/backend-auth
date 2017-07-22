@@ -1,49 +1,54 @@
 import * as express from 'express'
 import { Response, Request, NextFunction, Application } from 'express'
 import * as bodyParser from 'body-parser'
+import { RequestThrottler } from './middlewares/request.throttler'
+import config from './config'
 
-import jwtRoutes from './routes/jwt'
-import userRoutes from './routes/users'
-
-class StatusError extends Error {
-  status: number
-
-  constructor(msg: string, status: number) {
-    super(msg)
-    this.status = status
-  }
-}
+import { InversifyExpressServer } from 'inversify-express-utils'
+import { container } from './ioc.container'
 
 const app: Application = express()
+
+app.disable('x-powered-by')
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (config.app.forceHttps === 'enabled') {
+    if (!req.secure) {
+      return res.redirect('https://' + req.hostname + ':' + config.app.httpsPort + req.originalUrl)
+    }
+
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000')
+  }
+
+  if (req.header('Accept') !== 'application/json') {
+    return res.status(406).json({
+      error: 'Unsupported "Accept" header',
+    })
+  }
+
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'deny')
+  res.setHeader('Content-Security-Policy', 'default-src \'none\'')
+  return next()
+})
+
+app.post('*', (req: Request, res: Response, next: NextFunction) => {
+  if (req.header('Content-Type') !== 'application/json') {
+    return res.status(406).json({
+      error: 'Unsupported "Content-Type"',
+    })
+  }
+
+  return next()
+})
+
+const requestThrottler = new RequestThrottler()
+
+app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-/**
- * Routes
- */
-app.use('/auth', jwtRoutes)
-app.use('/user', userRoutes)
+let server = new InversifyExpressServer(container, null, null, app)
 
-/**
- * Catch 404 and forward to error handler
- */
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const err: StatusError = new StatusError('Not Found', 404)
-  next(err)
-})
-
-/**
- * Error handler
- */
-app.use((err: StatusError, req: Request, res: Response) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message
-  res.locals.error = req.app.get('env') === 'development' ? err : {}
-
-  // render the error page
-  res.status(err.status || 500)
-  res.json(res.locals)
-})
-
-export default app
+export default server.build()

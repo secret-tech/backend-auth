@@ -1,29 +1,47 @@
-import storage, { StorageService } from './storage.service'
+import { StorageService, StorageServiceType } from './storage.service'
 import * as uuid from 'node-uuid'
 import * as bcrypt from 'bcrypt-nodejs'
+import { injectable, inject } from 'inversify'
+import 'reflect-metadata'
 
+type UserData = {
+  email: string,
+  tenant: string,
+  login: string,
+  password: string,
+  sub: string
+  scope?: any
+}
+
+export interface UserServiceInterface {
+  get: (key: string) => Promise<string>
+  create: (userData: UserData) => Promise<any>
+  del: (key: string) => Promise<any>
+  getKey: (tenant: string, login: string) => string
+}
 
 /**
  * UserService
  */
-export class UserService {
-
+@injectable()
+export class UserService implements UserServiceInterface {
   /**
    * constructor
    *
-   * @param  client  redis client
+   * @param  storageService  redis client
    */
-  constructor(private client: StorageService) {}
-
+  constructor(
+    @inject(StorageServiceType) private storageService: StorageService
+  ) { }
 
   /**
    * Return user's data
    *
-   * @param  login  user's login (company + email)
+   * @param  key  user's key (tenant + login)
    * @return        promise
    */
-  get(login: string): Promise<string> {
-    return this.client.get(login)
+  get(key: string): Promise<string> {
+    return this.storageService.get(key)
   }
 
 
@@ -33,36 +51,38 @@ export class UserService {
    * @param userData user info
    * @return promise
    */
-  create(userData: any): Promise<any> {
-    const { email, tenant, password: passwordHash, scope } = userData
-
-    if (!email || !passwordHash || !tenant) {
-      throw new Error('Email, password and tenant are required parameters')
-    }
+  async create(userData: UserData): Promise<any> {
+    const { email, tenant, login, password: passwordHash, scope, sub } = userData
 
     const password: string = bcrypt.hashSync(passwordHash)
-    const login: string = `${tenant}:${email}`
+    const key: string = this.getKey(tenant, login)
     const data: any = {
       id: uuid.v4(),
       login,
       password,
       email,
       tenant,
-      scope
+      scope,
+      sub,
     }
-    this.client.set(login, JSON.stringify(data))
+    await this.storageService.set(key, JSON.stringify(data))
     return data
   }
 
   /**
    * Deletes user by login
    *
-   * @param login
+   * @param key
    * @return promise
    */
-  del(login: string): Promise<any> {
-    return this.client.del(login)
+  del(key: string): Promise<any> {
+    return this.storageService.del(key)
+  }
+
+  getKey(tenant: string, login: string) {
+    return `${tenant}:${login}`
   }
 }
 
-export default new UserService(storage)
+const UserServiceType = Symbol('UserServiceInterface')
+export { UserServiceType }

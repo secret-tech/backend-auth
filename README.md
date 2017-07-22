@@ -50,16 +50,16 @@ Checklist of the most important security countermeasures when designing, testing
 - [x] Don't store sensitive data in the JWT payload, it can be decoded [easily](https://jwt.io/#debugger-io).
 
 ### Access
-- [ ] Limit requests (Throttling) to avoid DDoS / Bruteforce attacks.
-- [ ] Use HTTPS on server side to avoid MITM (Man In The Middle Attack).
-- [ ] Use `HSTS` header with SSL to avoid SSL Strip attack.
+- [x] Limit requests (Throttling) to avoid DDoS / Bruteforce attacks.
+- [x] Use HTTPS on server side to avoid MITM (Man In The Middle Attack).
+- [x] Use `HSTS` header with SSL to avoid SSL Strip attack.
 
 ### Input
 - [x] Use proper HTTP method according to operation , `GET (read)`, `POST (create)`, `PUT (replace/update)` and `DELETE (to delete a record)`.
-- [ ] Validate `content-type` on request Accept header ( Content Negotiation ) to allow only your supported format (e.g. `application/xml` , `application/json` ... etc) and respond with `406 Not Acceptable` response if not matched.
-- [ ] Validate `content-type` of posted data as you accept (e.g. `application/x-www-form-urlencoded` , `multipart/form-data ,application/json` ... etc ).
+- [x] Validate `content-type` on request Accept header ( Content Negotiation ) to allow only your supported format (e.g. `application/xml` , `application/json` ... etc) and respond with `406 Not Acceptable` response if not matched.
+- [x] Validate `content-type` of posted data as you accept (e.g. `application/x-www-form-urlencoded` , `multipart/form-data ,application/json` ... etc ).
 - [ ] Validate User input to avoid common vulnerabilities (e.g. `XSS`, `SQL-Injection` , `Remote Code Execution` ... etc).
-- [ ] Don't use any sensitive data ( `credentials` , `Passwords`, `security tokens`, or `API keys`) in the URL, but use standard Authorization header.
+- [x] Don't use any sensitive data ( `credentials` , `Passwords`, `security tokens`, or `API keys`) in the URL, but use standard Authorization header.
 
 ### Processing
 - [ ] Check if all endpoint protected behind the authentication to avoid broken authentication.
@@ -67,10 +67,10 @@ Checklist of the most important security countermeasures when designing, testing
 - [ ] Do not forget to turn the DEBUG mode OFF.
 
 ### Output
-- [ ] Send `X-Content-Type-Options: nosniff` header.
-- [ ] Send `X-Frame-Options: deny` header.
-- [ ] Send `Content-Security-Policy: default-src 'none'` header.
-- [ ] Remove fingerprinting headers - `X-Powered-By`, `Server`, `X-AspNet-Version` etc.
+- [x] Send `X-Content-Type-Options: nosniff` header.
+- [x] Send `X-Frame-Options: deny` header.
+- [x] Send `Content-Security-Policy: default-src 'none'` header.
+- [x] Remove fingerprinting headers - `X-Powered-By`, `Server`, `X-AspNet-Version` etc.
 - [x] Force `content-type` for your response , if you return `application/json` then your response `content-type` is `application/json`.
-- [ ] Don't return sensitive data like `credentials` , `Passwords`, `security tokens`.
-- [ ] Return the proper status code according to the operation completed. (e.g. `200 OK` , `400 Bad Request` , `401 Unauthorized`, `405 Method Not Allowed` ... etc).
+- [x] Don't return sensitive data like `credentials` , `Passwords`, `security tokens`.
+- [x] Return the proper status code according to the operation completed. (e.g. `200 OK` , `400 Bad Request` , `401 Unauthorized`, `405 Method Not Allowed` ... etc).

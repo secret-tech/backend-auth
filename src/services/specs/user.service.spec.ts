@@ -1,6 +1,10 @@
+import { container } from '../../ioc.container'
 import { expect } from 'chai'
-import userService from '../user.service'
-import storageService from '../storage.service'
+import { StorageServiceType, StorageService } from '../storage.service'
+import { UserServiceType, UserServiceInterface } from '../user.service'
+
+const storageService = container.get<StorageService>(StorageServiceType)
+const userService = container.get<UserServiceInterface>(UserServiceType)
 
 describe('userService', () => {
   afterEach(async () => {
@@ -9,55 +13,16 @@ describe('userService', () => {
 
   describe('#create', () => {
     it('should create new user', async () => {
-      const user = { email: 'test', tenant: 'test', password: 'test' }
+      const user = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123', }
       const result = await userService.create(user)
 
       expect(result).to.be.a('object')
-    })
-
-    it('should require an email', async () => {
-      const user = { email: '', company: 'test', password: 'test' }
-      let error: Error
-
-      try {
-        await userService.create(user)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
-    })
-
-    it('should require an password', async () => {
-      const user = { email: 'test', company: 'test', password: '' }
-      let error: Error
-
-      try {
-        await userService.create(user)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
-    })
-
-    it('should require password and email', async () => {
-      const user = { email: '', company: 'test', password: '' }
-      let error: Error
-
-      try {
-        await userService.create(user)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('Email, password and tenant are required parameters')
     })
   })
 
   describe('#get', () => {
     before(async () => {
-      const userData = { email: 'test', tenant: 'test', password: 'test' }
+      const userData = { email: 'test', login: 'test', tenant: 'test', password: 'test',  sub: '123', }
       await userService.create(userData)
     })
 
@@ -65,7 +30,7 @@ describe('userService', () => {
       const userStr = await userService.get('test:test')
       const user = JSON.parse(userStr)
 
-      expect(user.login).to.equal('test:test')
+      expect(user.login).to.equal('test')
     })
   })
 })
