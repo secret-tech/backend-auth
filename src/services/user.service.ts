@@ -4,29 +4,35 @@ import * as bcrypt from 'bcrypt-nodejs'
 import { injectable, inject } from 'inversify'
 import 'reflect-metadata'
 
+type UserData = {
+  email: string,
+  tenant: string,
+  login: string,
+  password: string,
+  sub: string
+  scope?: any
+}
+
 export interface UserServiceInterface {
   get: (key: string) => Promise<string>
-  create: (userData: any) => Promise<any>
+  create: (userData: UserData) => Promise<any>
   del: (key: string) => Promise<any>
   getKey: (tenant: string, login: string) => string
 }
+
 /**
  * UserService
  */
 @injectable()
 export class UserService implements UserServiceInterface {
-  private storageService: StorageService
   /**
    * constructor
    *
    * @param  storageService  redis client
    */
   constructor(
-    @inject(StorageServiceType) storageService: StorageService
-  ) {
-    this.storageService = storageService
-  }
-
+    @inject(StorageServiceType) private storageService: StorageService
+  ) { }
 
   /**
    * Return user's data
@@ -45,12 +51,8 @@ export class UserService implements UserServiceInterface {
    * @param userData user info
    * @return promise
    */
-  async create(userData: any): Promise<any> {
+  async create(userData: UserData): Promise<any> {
     const { email, tenant, login, password: passwordHash, scope, sub } = userData
-
-    if (!email || !passwordHash || !tenant || !sub || !login) {
-      throw new Error('Email, password, tenant, login and sub are required parameters')
-    }
 
     const password: string = bcrypt.hashSync(passwordHash)
     const key: string = this.getKey(tenant, login)

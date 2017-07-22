@@ -4,9 +4,21 @@ import { injectable } from 'inversify'
 
 const { algorithm, secret_separator, secret, expiration } = config.jwt
 
+type TokenUserData = {
+  id: string,
+  login: string,
+  sub: string
+  scope?: any,
+}
+
+type TokenTenantData = {
+  id: string,
+  login: string,
+}
+
 export interface JWTServiceInterface {
-  generateUserToken: (user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number) => any
-  generateTenantToken: (tenant: any, sessionKey: string, userKey: string, issuedAt: number) => string
+  generateUserToken: (user: TokenUserData, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number) => any
+  generateTenantToken: (tenant: TokenTenantData, sessionKey: string, userKey: string, issuedAt: number) => string
   verify: (token: string, userKey: string) => Promise<boolean>
   decode: (token: string) => any
 }
@@ -39,12 +51,8 @@ export class JWTService implements JWTServiceInterface {
    * @param  expiresIn  expiration time
    * @return  generated token
    */
-  generateUserToken(user: any, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number): any {
+  generateUserToken(user: TokenUserData, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number): any {
     const { id, login, scope, sub } = user
-
-    if (!id || !login || !sub) {
-      throw new Error('user.id and user.login are required parameters')
-    }
 
     if (!expiresIn) {
       expiresIn = expiration
@@ -76,12 +84,8 @@ export class JWTService implements JWTServiceInterface {
    * @param  issuedAt   time of creation
    * @return  generated token
    */
-  generateTenantToken(tenant: any, sessionKey: string, userKey: string, issuedAt: number): string {
+  generateTenantToken(tenant: TokenTenantData, sessionKey: string, userKey: string, issuedAt: number): string {
     const { id, login, } = tenant
-
-    if (!id || !login) {
-      throw new Error('tenant id and tenant login are required parameters')
-    }
 
     const payload = {
       id,

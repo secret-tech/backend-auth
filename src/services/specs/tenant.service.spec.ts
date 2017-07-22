@@ -21,33 +21,6 @@ describe('tenantService', () => {
 
       expect(result).to.be.a('object')
     })
-
-    it('should require an email', async () => {
-      const tenant = { email: '', password: 'test' }
-      let error: Error
-
-      try {
-        await tenantService.create(tenant)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('Email and password are required parameters')
-    })
-
-    it('should require a password', async () => {
-      const tenant = { email: 'test', password: '', }
-      let error: Error
-
-      try {
-        await tenantService.create(tenant)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('Email and password are required parameters')
-    })
-
   })
 
   describe('#login', () => {

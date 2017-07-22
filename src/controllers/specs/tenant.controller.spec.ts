@@ -17,7 +17,7 @@ describe('Tenants', () => {
 
   describe('POST /tenant', () => {
     it('should create tenant', (done) => {
-      const params = { email: 'test@test.com', password: 'test' }
+      const params = { email: 'test@test.com', password: 'testA6' }
       request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
         expect(res.status).to.equal(200)
         expect(res.body.email).to.equal('test@test.com')
@@ -29,7 +29,7 @@ describe('Tenants', () => {
     })
 
     it('should not create tenant when email already exists', (done) => {
-      const params = { email: 'test@test.com', password: 'test' }
+      const params = { email: 'test@test.com', password: 'testA6' }
       request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
         request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
           expect(res.status).to.equal(400)
@@ -39,9 +39,10 @@ describe('Tenants', () => {
       })
     })
 
-    it('should require email and password', (done) => {
-      request(app).post('/tenant').set('Accept', 'application/json').send({}).end((err, res) => {
-        expect(res.status).to.equal(400)
+    it('should require email', (done) => {
+      request(app).post('/tenant').set('Accept', 'application/json').send({ password: 'testA6' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"email" is required')
         done()
       })
     })
@@ -50,8 +51,32 @@ describe('Tenants', () => {
       const params = { email: 'test.test.com', password: 'test' }
 
       request(app).post('/tenant').set('Accept', 'application/json').send(params).end((err, res) => {
-        expect(res.status).to.equal(400)
-        expect(res.body.error).to.equal('Email is invalid')
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"email" must be a valid email')
+        done()
+      })
+    })
+
+    it('should require password', (done) => {
+      request(app).post('/tenant').set('Accept', 'application/json').send({ email: 'test@test.com' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" is required')
+        done()
+      })
+    })
+
+    it('should validate password length', (done) => {
+      request(app).post('/tenant').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" length must be at least 6 characters long')
+        done()
+      })
+    })
+
+    it('should validate password format', (done) => {
+      request(app).post('/tenant').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test12' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" with value "test12" fails to match the required pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$/')
         done()
       })
     })
@@ -59,7 +84,7 @@ describe('Tenants', () => {
 
   describe('POST /tenant/login', () => {
     it('should authenticate tenant', (done) => {
-      const tenant = {email: 'test@test.com', password: 'test', }
+      const tenant = {email: 'test@test.com', password: 'testA6', }
       tenantService.create(tenant)
       request(app).post('/tenant/login').set('Accept', 'application/json').send(tenant).end((err, res) => {
         expect(res.status).to.equal(200)
@@ -69,10 +94,10 @@ describe('Tenants', () => {
     })
 
     it('should not authenticate tenant with incorrect password', (done) => {
-      const tenant = {email: 'test@test.com', password: 'test', }
+      const tenant = {email: 'test@test.com', password: 'testA6', }
       tenantService.create(tenant)
 
-      const params = {email: 'test@test.com', password: 'test1', }
+      const params = {email: 'test@test.com', password: 'testA61', }
       request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
         expect(res.status).to.equal(500)
         expect(res.body.error).to.equal('Password is incorrect')
@@ -84,7 +109,7 @@ describe('Tenants', () => {
       const tenant = { email: 'test@test.com', password: 'test', }
       tenantService.create(tenant)
 
-      const params = { email: 'test1@test.com', password: 'test', }
+      const params = { email: 'test1@test.com', password: 'testA6', }
       request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
         expect(res.status).to.equal(500)
         expect(res.body.error).to.equal('Tenant is not found')
@@ -93,19 +118,43 @@ describe('Tenants', () => {
     })
 
     it('should require email', (done) => {
-      const params = { password: 'test' }
+      request(app).post('/tenant/login').set('Accept', 'application/json').send({ password: 'testA6' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"email" is required')
+        done()
+      })
+    })
+
+    it('should validate email ', (done) => {
+      const params = { email: 'test.test.com', password: 'test' }
+
       request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
-        expect(res.status).to.equal(400)
-        expect(res.body.error).to.equal('Email and password are required parameters')
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"email" must be a valid email')
         done()
       })
     })
 
     it('should require password', (done) => {
-      const params = { email: 'test@test.com', }
-      request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
-        expect(res.status).to.equal(400)
-        expect(res.body.error).to.equal('Email and password are required parameters')
+      request(app).post('/tenant/login').set('Accept', 'application/json').send({ email: 'test@test.com' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" is required')
+        done()
+      })
+    })
+
+    it('should validate password length', (done) => {
+      request(app).post('/tenant/login').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" length must be at least 6 characters long')
+        done()
+      })
+    })
+
+    it('should validate password format', (done) => {
+      request(app).post('/tenant/login').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test12' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" with value "test12" fails to match the required pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$/')
         done()
       })
     })
@@ -134,6 +183,14 @@ describe('Tenants', () => {
             done()
           })
         })
+      })
+    })
+
+    it('should require token', (done) => {
+      request(app).post('/tenant/logout').set('Accept', 'application/json').send({}).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"token" is required')
+        done()
       })
     })
   })
