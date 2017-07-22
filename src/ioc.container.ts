@@ -10,6 +10,7 @@ import { interfaces, TYPE } from 'inversify-express-utils'
 import { UserService, UserServiceInterface, UserServiceType } from './services/user.service'
 import { Auth } from './middlewares/auth'
 import * as express from 'express'
+import * as validation from './middlewares/request.validation'
 
 let container = new Container()
 
@@ -22,7 +23,24 @@ container.bind<UserServiceInterface>(UserServiceType).to(UserService)
 
 // middlewares
 const auth = new Auth(container.get<KeyServiceInterface>(KeyServiceType))
-container.bind<express.RequestHandler>('AuthMiddleware').toConstantValue((req: any, res: any, next: any) => auth.authenticate(req, res, next))
+container.bind<express.RequestHandler>('AuthMiddleware').toConstantValue(
+  (req: any, res: any, next: any) => auth.authenticate(req, res, next)
+)
+container.bind<express.RequestHandler>('CreateUserValidation').toConstantValue(
+  (req: any, res: any, next: any) => validation.createUser(req, res, next)
+)
+container.bind<express.RequestHandler>('CreateTenantValidation').toConstantValue(
+  (req: any, res: any, next: any) => validation.createTenant(req, res, next)
+)
+container.bind<express.RequestHandler>('LoginTenantValidation').toConstantValue(
+  (req: any, res: any, next: any) => validation.loginTenant(req, res, next)
+)
+container.bind<express.RequestHandler>('CreateTokenValidation').toConstantValue(
+  (req: any, res: any, next: any) => validation.createToken(req, res, next)
+)
+container.bind<express.RequestHandler>('TokenRequiredValidation').toConstantValue(
+  (req: any, res: any, next: any) => validation.tokenRequired(req, res, next)
+)
 
 // controllers
 container.bind<interfaces.Controller>(TYPE.Controller).to(JWTController).whenTargetNamed('JWTController')

@@ -19,7 +19,7 @@ describe('Users', () => {
   })
 
   beforeEach(async () => {
-    const params = { email: 'test@test.com', password: 'test', }
+    const params = { email: 'test@test.com', password: 'testA6', }
     tenant = await tenantService.create(params)
     token = await tenantService.login(params)
   })
@@ -35,16 +35,65 @@ describe('Users', () => {
     })
 
     it('should create user', (done) => {
-      const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test', sub: '123', }
+      const params = { email: 'test@test.com', login: 'test', password: 'test', sub: '123', }
       postRequest('/user').send(params).end((err, res) => {
         expect(res.status).to.equal(200)
         done()
       })
     })
 
-    it('should require email and password', async () => {
-      postRequest('/user').send({}).end((err, res) => {
-        expect(res.status).to.equal(400)
+    it('should validate email', (done) => {
+      const params = { email: 'test.test.com', login: 'test', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"email" must be a valid email')
+        done()
+      })
+    })
+
+    it('should require email', (done) => {
+      const params = { login: 'test', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"email" is required')
+        done()
+      })
+    })
+
+    it('should require login', (done) => {
+      const params = { email: 'test@test.com', password: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"login" is required')
+        done()
+      })
+    })
+
+    it('should require password', (done) => {
+      const params = { email: 'test@test.com', login: 'test', sub: '123', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"password" is required')
+        done()
+      })
+    })
+
+    it('should require sub', (done) => {
+      const params = { email: 'test@test.com', login: 'test', password: 'test', }
+
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(422)
+
+        expect(res.body.error.details[0].message).to.equal('"sub" is required')
+        done()
       })
     })
   })
@@ -73,6 +122,13 @@ describe('Users', () => {
     it('should respond with 404 code if login is not found', (done) => {
       delRequest('/user/123').end((err, res) => {
         expect(res.status).to.equal(404)
+        done()
+      })
+    })
+
+    it('should require login', (done) => {
+      delRequest('/user/').end((err, res) => {
+        expect(res.status).to.equal(404) // 404 because no matching route is found, so validation does not make sense here
         done()
       })
     })

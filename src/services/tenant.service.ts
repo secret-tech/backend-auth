@@ -4,12 +4,16 @@ import * as bcrypt from 'bcrypt-nodejs'
 import { KeyServiceInterface, KeyServiceType } from './key.service'
 import { injectable, inject } from 'inversify'
 import 'reflect-metadata'
-const EMAIL_REGEXP = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+
+type TenantData = {
+  email: string,
+  password: string
+}
 
 export interface TenantServiceInterface {
   get: (key: string) => Promise<string>
-  create: (userData: any) => Promise<any>
-  login: (userData: any) => Promise<string>
+  create: (userData: TenantData) => Promise<any>
+  login: (userData: TenantData) => Promise<string>
 }
 
 /**
@@ -46,16 +50,8 @@ export class TenantService implements TenantServiceInterface {
    * @param userData user info
    * @return promise
    */
-  async create(userData: any): Promise<any> {
+  async create(userData: TenantData): Promise<any> {
     const { email, password } = userData
-
-    if (!email || !password) {
-      throw new Error('Email and password are required parameters')
-    }
-
-    if (!EMAIL_REGEXP.test(email)) {
-      throw new Error('Email is invalid')
-    }
 
     const passwordHash = bcrypt.hashSync(password)
     const login: string = `tenant:${email}`
@@ -78,12 +74,8 @@ export class TenantService implements TenantServiceInterface {
     return data
   }
 
-  async login(userData: any): Promise<string> {
+  async login(userData: TenantData): Promise<string> {
     const { email, password } = userData
-
-    if (!email || !password) {
-      throw new Error('Email and password are required parameters')
-    }
 
     const login: string = `tenant:${email}`
     const tenant = await this.get(login)

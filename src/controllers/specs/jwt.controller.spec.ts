@@ -46,9 +46,26 @@ describe('Authenticate', () => {
       })
     })
 
-    it('should require email and password', (done) => {
-      postRequest('/auth').send({}).end((err, res) => {
-        expect(res.status).to.equal(400)
+    it('should require login', (done) => {
+      postRequest('/auth').send({ password: '123', deviceId: 'device' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"login" is required')
+        done()
+      })
+    })
+
+    it('should require password', (done) => {
+      postRequest('/auth').send({ login: '123', deviceId: 'device' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"password" is required')
+        done()
+      })
+    })
+
+    it('should require deviceId', (done) => {
+      postRequest('/auth').send({ login: '123', password: '123' }).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"deviceId" is required')
         done()
       })
     })
@@ -102,6 +119,14 @@ describe('Authenticate', () => {
         done()
       })
     })
+
+    it('should require token', (done) => {
+      postRequest('/auth/logout').send({}).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"token" is required')
+        done()
+      })
+    })
   })
 
   describe('POST /auth/verify', () => {
@@ -127,6 +152,14 @@ describe('Authenticate', () => {
     it('should be invalid token', (done) => {
       postRequest('/auth/verify').send({ token: 'test' }).end((err, res) => {
         expect(res.status).to.equal(400)
+        done()
+      })
+    })
+
+    it('should require token', (done) => {
+      postRequest('/auth/verify').send({}).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"token" is required')
         done()
       })
     })

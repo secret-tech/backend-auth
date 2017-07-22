@@ -28,18 +28,13 @@ export class JWTController {
    * @param  res  express res object
    * @param  next express next middleware function
    */
-  @httpPost('/')
+  @httpPost(
+    '/',
+    'CreateTokenValidation'
+  )
   async create(req: AuthorizedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { login, password, deviceId } = req.body
-
-      if (!login || !password || !deviceId) {
-        res.status(400).send({
-          error: 'login, password and deviceId are required parameters',
-          status: 400
-        })
-        return
-      }
 
       const key = this.userService.getKey(req.tenant.id, login)
       const userStr = await this.userService.get(key)
@@ -79,7 +74,10 @@ export class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  @httpPost('/verify')
+  @httpPost(
+    '/verify',
+    'TokenRequiredValidation'
+  )
   async verify(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
     const { valid, decoded } = await this.keyService.verifyToken(token)
@@ -100,7 +98,10 @@ export class JWTController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  @httpPost('/logout')
+  @httpPost(
+    '/logout',
+    'TokenRequiredValidation'
+  )
   async logout(req: AuthorizedRequest, res: Response): Promise<void> {
     const { token } = req.body
     const { valid, decoded } = await this.keyService.verifyToken(token)

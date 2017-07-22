@@ -14,25 +14,7 @@ describe('jwtService', () => {
         sub: '123',
       }
       const token = jwtService.generateUserToken(user, 'device_id', 'key', 'user_key', Date.now(), 60)
-
       expect(token).to.exist
-    })
-
-    it('should require user.id and user.login', () => {
-      const user = {
-        id: '',
-        login: '',
-        sub: '123',
-      }
-      let error: Error
-
-      try {
-        jwtService.generateUserToken(user, 'device_id', 'key', 'user_key', Date.now(), 60)
-      } catch (e) {
-        error = e
-      }
-
-      expect(error.message).to.equal('user.id and user.login are required parameters')
     })
   })
 

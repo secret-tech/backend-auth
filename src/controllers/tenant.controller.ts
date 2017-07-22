@@ -21,20 +21,15 @@ export class TenantController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  @httpPost('/')
+  @httpPost(
+    '/',
+    'CreateTenantValidation'
+  )
   async create(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body
 
-    if (!email || !password) {
-      res.status(400).send({
-        error: 'email and password are required parameters',
-        status: 400
-      })
-      return
-    }
-
     try {
-      const result = await this.tenantService.create({email, password})
+      const result = await this.tenantService.create({ email, password })
       res.json(result)
     } catch (e) {
       res.status(400).json({
@@ -49,17 +44,12 @@ export class TenantController {
    * @param  req  express req object
    * @param  res  express res object
    */
-  @httpPost('/login')
+  @httpPost(
+    '/login',
+    'LoginTenantValidation'
+  )
   async login(req: Request, res: Response): Promise<void> {
     const { email , password } = req.body
-
-    if (!email || !password) {
-      res.status(400).send({
-        error: 'Email and password are required parameters',
-        status: 400
-      })
-      return
-    }
 
     let token
     let error
@@ -74,7 +64,10 @@ export class TenantController {
       : res.status(500).send({ error })
   }
 
-  @httpPost('/logout')
+  @httpPost(
+    '/logout',
+    'TokenRequiredValidation'
+  )
   async logout(req: Request, res: Response): Promise<void> {
     const { token } = req.body
     const { valid, decoded } = await this.keyService.verifyToken(token)
