@@ -19,13 +19,10 @@ export default {
 		httpsServer: HTTPS_SERVER || 'disabled',
 		forceHttps: FORCE_HTTPS || 'disabled'
 	},
-	key_service: {
-		expires_seconds: 604800
-	},
 	jwt: {
 		algorithm: 'HS256',
 		secret_separator: ':',
-		expiration: 60,
+		expiration: 604800,
 		secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
 	},
 	redis: {
