@@ -19,9 +19,6 @@ export default {
 		httpsServer: HTTPS_SERVER || 'disabled',
 		forceHttps: FORCE_HTTPS || 'disabled'
 	},
-	key_service: {
-		expires_seconds: 604800
-	},
 	jwt: {
 		algorithm: 'HS256',
 		secret_separator: ':',
