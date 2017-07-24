@@ -42,6 +42,14 @@ describe('Users', () => {
       })
     })
 
+    it('should create user when additional fields are present in request', (done) => {
+      const params = { employeeId: 'id', email: 'test@test.com', login: 'test', password: 'test', sub: '123', }
+      postRequest('/user').send(params).end((err, res) => {
+        expect(res.status).to.equal(200)
+        done()
+      })
+    })
+
     it('should validate email', (done) => {
       const params = { email: 'test.test.com', login: 'test', password: 'test', sub: '123', }
 
