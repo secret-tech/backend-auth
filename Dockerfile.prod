@@ -9,4 +9,4 @@ RUN npm i
 RUN mkdir ./dist
 RUN npm run build
 
-CMD npm start
+CMD npm run serve
