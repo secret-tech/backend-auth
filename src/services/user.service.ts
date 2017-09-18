@@ -1,8 +1,8 @@
-import { StorageService, StorageServiceType } from './storage.service'
-import * as uuid from 'node-uuid'
-import * as bcrypt from 'bcrypt-nodejs'
-import { injectable, inject } from 'inversify'
-import 'reflect-metadata'
+import { StorageService, StorageServiceType } from './storage.service';
+import * as uuid from 'node-uuid';
+import * as bcrypt from 'bcrypt-nodejs';
+import { injectable, inject } from 'inversify';
+import 'reflect-metadata';
 
 type UserData = {
   email: string,
@@ -11,13 +11,13 @@ type UserData = {
   password: string,
   sub: string
   scope?: any
-}
+};
 
 export interface UserServiceInterface {
-  get: (key: string) => Promise<string>
-  create: (userData: UserData) => Promise<any>
-  del: (key: string) => Promise<any>
-  getKey: (tenant: string, login: string) => string
+  get: (key: string) => Promise<string>;
+  create: (userData: UserData) => Promise<any>;
+  del: (key: string) => Promise<any>;
+  getKey: (tenant: string, login: string) => string;
 }
 
 /**
@@ -41,9 +41,8 @@ export class UserService implements UserServiceInterface {
    * @return        promise
    */
   get(key: string): Promise<string> {
-    return this.storageService.get(key)
+    return this.storageService.get(key);
   }
-
 
   /**
    * Save user's data
@@ -52,10 +51,10 @@ export class UserService implements UserServiceInterface {
    * @return promise
    */
   async create(userData: UserData): Promise<any> {
-    const { email, tenant, login, password: passwordHash, scope, sub } = userData
+    const { email, tenant, login, password: passwordHash, scope, sub } = userData;
 
-    const password: string = bcrypt.hashSync(passwordHash)
-    const key: string = this.getKey(tenant, login)
+    const password: string = bcrypt.hashSync(passwordHash);
+    const key: string = this.getKey(tenant, login);
     const data: any = {
       id: uuid.v4(),
       login,
@@ -63,10 +62,10 @@ export class UserService implements UserServiceInterface {
       email,
       tenant,
       scope,
-      sub,
-    }
-    await this.storageService.set(key, JSON.stringify(data))
-    return data
+      sub
+    };
+    await this.storageService.set(key, JSON.stringify(data));
+    return data;
   }
 
   /**
@@ -76,13 +75,13 @@ export class UserService implements UserServiceInterface {
    * @return promise
    */
   del(key: string): Promise<any> {
-    return this.storageService.del(key)
+    return this.storageService.del(key);
   }
 
   getKey(tenant: string, login: string) {
-    return `${tenant}:${login}`
+    return `${tenant}:${login}`;
   }
 }
 
-const UserServiceType = Symbol('UserServiceInterface')
-export { UserServiceType }
+const UserServiceType = Symbol('UserServiceInterface');
+export { UserServiceType };

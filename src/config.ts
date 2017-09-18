@@ -10,7 +10,7 @@ const {
   THROTTLER_MAX,
   THROTTLER_MIN_DIFF,
   JWT_KEY
-} = process.env
+} = process.env;
 
 export default {
   app: {
@@ -21,7 +21,7 @@ export default {
   },
   jwt: {
     algorithm: 'HS256',
-    secret_separator: ':',
+    secretSeparator: ':',
     expiration: 604800,
     secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
   },
@@ -37,4 +37,4 @@ export default {
     minDifference: THROTTLER_MIN_DIFF || 0, // optional, minimum time between 2 requests from 1 IP
     whiteList: THROTTLER_WHITE_LIST ? THROTTLER_WHITE_LIST.split(',') : [] // requests from these IPs won't be throttled
   }
-}
+};

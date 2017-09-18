@@ -1,8 +1,8 @@
-import { Request, Response } from 'express'
-import { TenantServiceType, TenantServiceInterface } from '../services/tenant.service'
-import { KeyServiceInterface, KeyServiceType } from '../services/key.service'
-import { inject, injectable } from 'inversify'
-import { controller, httpPost } from 'inversify-express-utils'
+import { Request, Response } from 'express';
+import { TenantServiceType, TenantServiceInterface } from '../services/tenant.service';
+import { KeyServiceInterface, KeyServiceType } from '../services/key.service';
+import { inject, injectable } from 'inversify';
+import { controller, httpPost } from 'inversify-express-utils';
 
 /**
  * TenantController
@@ -10,9 +10,9 @@ import { controller, httpPost } from 'inversify-express-utils'
 @injectable()
 @controller('/tenant')
 export class TenantController {
-  constructor (
+  constructor(
     @inject(TenantServiceType) private tenantService: TenantServiceInterface,
-    @inject(KeyServiceType) private keyService: KeyServiceInterface,
+    @inject(KeyServiceType) private keyService: KeyServiceInterface
   ) { }
 
   /**
@@ -26,15 +26,15 @@ export class TenantController {
     'CreateTenantValidation'
   )
   async create(req: Request, res: Response): Promise<void> {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     try {
-      const result = await this.tenantService.create({ email, password })
-      res.json(result)
+      const result = await this.tenantService.create({ email, password });
+      res.json(result);
     } catch (e) {
       res.status(400).json({
         error: e.message
-      })
+      });
     }
   }
 
@@ -49,19 +49,19 @@ export class TenantController {
     'LoginTenantValidation'
   )
   async login(req: Request, res: Response): Promise<void> {
-    const { email , password } = req.body
+    const { email , password } = req.body;
 
-    let token
-    let error
+    let token;
+    let error;
     try {
-      token = await this.tenantService.login({ email, password })
+      token = await this.tenantService.login({ email, password });
     } catch (e) {
-      error = e.message
+      error = e.message;
     }
 
     token
       ? res.status(200).send({ accessToken: token })
-      : res.status(500).send({ error })
+      : res.status(500).send({ error });
   }
 
   @httpPost(
@@ -69,21 +69,21 @@ export class TenantController {
     'TokenRequiredValidation'
   )
   async logout(req: Request, res: Response): Promise<void> {
-    const { token } = req.body
-    const { valid, decoded } = await this.keyService.verifyToken(token)
+    const { token } = req.body;
+    const { valid, decoded } = await this.keyService.verifyToken(token);
 
     if (!valid) {
       res.status(400).send({
         error: 'invalid token'
-      })
-      return
+      });
+      return;
     }
 
-    const result = await this.keyService.del(decoded.jti)
+    const result = await this.keyService.del(decoded.jti);
 
     result
       ? res.status(200).send({ result: result })
-      : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' })
+      : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' });
   }
 
   @httpPost(
@@ -91,16 +91,16 @@ export class TenantController {
     'TokenRequiredValidation'
   )
   async verify(req: Request, res: Response): Promise<void> {
-    const { token } = req.body
-    const { valid, decoded } = await this.keyService.verifyToken(token)
+    const { token } = req.body;
+    const { valid, decoded } = await this.keyService.verifyToken(token);
 
     if (!valid) {
       res.status(400).send({
         error: 'invalid token'
-      })
-      return
+      });
+      return;
     }
 
-    res.status(200).send({ decoded: decoded })
+    res.status(200).send({ decoded: decoded });
   }
 }
