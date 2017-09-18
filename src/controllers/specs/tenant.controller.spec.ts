@@ -194,4 +194,39 @@ describe('Tenants', () => {
       })
     })
   })
+
+  describe('POST /tenant/verify', () => {
+    it('should verify valid token', (done) => {
+      const tenant = {email: 'test@test.com', password: 'test'}
+      tenantService.create(tenant).then(() => {
+        tenantService.login(tenant).then((token) => {
+          request(app).post('/tenant/verify').set('Accept', 'application/json').send({token}).end((err, res) => {
+            expect(res.status).to.equal(200)
+            expect(res.body.decoded).to.be.a('object')
+            done()
+          })
+        })
+      })
+    })
+
+    it('should respond with error for incorrect token', (done) => {
+      const tenant = {email: 'test@test.com', password: 'test'}
+      tenantService.create(tenant).then(() => {
+        tenantService.login(tenant).then((token) => {
+          request(app).post('/tenant/verify').set('Accept', 'application/json').send({token: token + '1'}).end((err, res) => {
+            expect(res.status).to.equal(400)
+            done()
+          })
+        })
+      })
+    })
+
+    it('should require token', (done) => {
+      request(app).post('/tenant/verify').set('Accept', 'application/json').send({}).end((err, res) => {
+        expect(res.status).to.equal(422)
+        expect(res.body.error.details[0].message).to.equal('"token" is required')
+        done()
+      })
+    })
+  })
 })

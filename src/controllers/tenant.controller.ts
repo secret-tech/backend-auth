@@ -85,4 +85,22 @@ export class TenantController {
       ? res.status(200).send({ result: result })
       : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' })
   }
+
+  @httpPost(
+    '/verify',
+    'TokenRequiredValidation'
+  )
+  async verify(req: Request, res: Response): Promise<void> {
+    const { token } = req.body
+    const { valid, decoded } = await this.keyService.verifyToken(token)
+
+    if (!valid) {
+      res.status(400).send({
+        error: 'invalid token'
+      })
+      return
+    }
+
+    res.status(200).send({ decoded: decoded })
+  }
 }
