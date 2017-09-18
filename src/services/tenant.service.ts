@@ -1,19 +1,19 @@
-import { StorageService, StorageServiceType } from './storage.service'
-import * as uuid from 'node-uuid'
-import * as bcrypt from 'bcrypt-nodejs'
-import { KeyServiceInterface, KeyServiceType } from './key.service'
-import { injectable, inject } from 'inversify'
-import 'reflect-metadata'
+import { StorageService, StorageServiceType } from './storage.service';
+import * as uuid from 'node-uuid';
+import * as bcrypt from 'bcrypt-nodejs';
+import { KeyServiceInterface, KeyServiceType } from './key.service';
+import { injectable, inject } from 'inversify';
+import 'reflect-metadata';
 
 type TenantData = {
   email: string,
   password: string
-}
+};
 
 export interface TenantServiceInterface {
-  get: (key: string) => Promise<string>
-  create: (userData: TenantData) => Promise<any>
-  login: (userData: TenantData) => Promise<string>
+  get: (key: string) => Promise<string>;
+  create: (userData: TenantData) => Promise<any>;
+  login: (userData: TenantData) => Promise<string>;
 }
 
 /**
@@ -32,7 +32,6 @@ export class TenantService implements TenantServiceInterface {
     @inject(KeyServiceType) private keyService: KeyServiceInterface
   ) { }
 
-
   /**
    * Return user's data
    *
@@ -40,9 +39,8 @@ export class TenantService implements TenantServiceInterface {
    * @return        promise
    */
   get(login: string): Promise<string> {
-    return this.client.get(login)
+    return this.client.get(login);
   }
-
 
   /**
    * Save user's data
@@ -51,49 +49,49 @@ export class TenantService implements TenantServiceInterface {
    * @return promise
    */
   async create(userData: TenantData): Promise<any> {
-    const { email, password } = userData
+    const { email, password } = userData;
 
-    const passwordHash = bcrypt.hashSync(password)
-    const login: string = `tenant:${email}`
+    const passwordHash = bcrypt.hashSync(password);
+    const login: string = `tenant:${email}`;
 
-    const exists = await this.get(login)
+    const exists = await this.get(login);
     if (exists) {
-      throw new Error('This tenant\'s email already exists')
+      throw new Error('This tenant\'s email already exists');
     }
 
     const data: any = {
       id: uuid.v4(),
       login,
       passwordHash,
-      email,
-    }
+      email
+    };
 
-    this.client.set(login, JSON.stringify(data))
+    this.client.set(login, JSON.stringify(data));
 
-    delete data.passwordHash
-    return data
+    delete data.passwordHash;
+    return data;
   }
 
   async login(userData: TenantData): Promise<string> {
-    const { email, password } = userData
+    const { email, password } = userData;
 
-    const login: string = `tenant:${email}`
-    const tenant = await this.get(login)
+    const login: string = `tenant:${email}`;
+    const tenant = await this.get(login);
 
     if (!tenant) {
-      throw new Error('Tenant is not found')
+      throw new Error('Tenant is not found');
     }
 
-    const data = JSON.parse(tenant)
+    const data = JSON.parse(tenant);
 
     if (!bcrypt.compareSync(password, data.passwordHash)) {
-      throw new Error('Password is incorrect')
+      throw new Error('Password is incorrect');
     }
 
-    return await this.keyService.setTenantToken(data)
+    return await this.keyService.setTenantToken(data);
   }
 
 }
 
-const TenantServiceType = Symbol('TenantService')
-export { TenantServiceType }
+const TenantServiceType = Symbol('TenantService');
+export { TenantServiceType };

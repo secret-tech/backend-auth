@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./src/bin/www --exec ts-node",
-    "lint": "tslint ./src/**/*.ts",
+    "lint": "tslint --fix -c tslint.json ./src/**/**/*.ts",
     "test": "nyc mocha ./src/**/*.spec.ts",
-    "build": "tsc --outDir dist",
+    "build": "tsc --outDir dist ",
     "serve": "node ./dist/bin/www.js"
   },
   "nyc": {
@@ -46,7 +46,9 @@
     "nodemon": "^1.11.0",
     "nyc": "10.0.0",
     "ts-node": "2.0.0",
-    "tslint": "4.3.1",
+    "tslint": "5.7.0",
+    "tslint-config-standard": "5.0.2",
+    "tslint-loader": "3.5.3",
     "typescript": "2.1.5"
   }
 }
