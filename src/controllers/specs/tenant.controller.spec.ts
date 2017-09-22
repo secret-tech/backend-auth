@@ -1,8 +1,11 @@
 import * as chai from 'chai';
 import app from '../../app';
+import IpWhiteListFilter from '../../middlewares/ip.whitelist';
 import { container } from '../../ioc.container';
 import { StorageServiceType, StorageService } from '../../services/storage.service';
 import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service';
+import * as express from 'express';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
 chai.use(require('chai-http'));
 const { expect, request } = chai;
@@ -77,6 +80,20 @@ describe('Tenants', () => {
       request(app).post('/tenant').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test12' }).end((err, res) => {
         expect(res.status).to.equal(422);
         expect(res.body.error.details[0].message).to.equal('"password" with value "test12" fails to match the required pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$/');
+        done();
+      });
+    });
+
+    it('should use tenant IP whitelist', (done) => {
+      container.rebind<express.RequestHandler>('TenantIpWhiteList').toConstantValue(
+        (req: any, res: any, next: any) => (new IpWhiteListFilter([])).filter(req, res, next)
+      );
+
+      // create new app with new TenantIpWhiteList binding.
+      const testApp = new InversifyExpressServer(container).build();
+
+      request(testApp).post('/tenant').set('Accept', 'application/json').send({ email: 'test@test.com', password: 'test12' }).end((err, res) => {
+        expect(res.status).to.equal(403);
         done();
       });
     });

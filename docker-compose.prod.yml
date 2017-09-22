@@ -12,6 +12,7 @@ services:
       FORCE_HTTPS: disabled
       JWT_KEY: "uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r"
       THROTTLER_WHITE_LIST: "127.0.0.1"
+      TENANT_WHITE_LIST: "127.0.0.1"
     ports:
       - "3000"
       - "4000"
