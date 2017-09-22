@@ -2,7 +2,7 @@ version: '2'
 services:
 
   auth:
-    image: registry.jincor.com/backend/auth:latest
+    image: registry.jincor.com/backend/auth-develop:latest
     build:
         context: ./
         dockerfile: Dockerfile
@@ -17,6 +17,7 @@ services:
       - "4000"
     volumes:
       - ./:/usr/src/app
+      - /usr/src/app/node_modules
     links:
       - redis
   redis:
