@@ -23,6 +23,7 @@ export class TenantController {
    */
   @httpPost(
     '/',
+    'TenantIpWhiteList',
     'CreateTenantValidation'
   )
   async create(req: Request, res: Response): Promise<void> {

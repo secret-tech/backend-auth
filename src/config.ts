@@ -9,7 +9,8 @@ const {
   THROTTLER_INTERVAL,
   THROTTLER_MAX,
   THROTTLER_MIN_DIFF,
-  JWT_KEY
+  JWT_KEY,
+  TENANT_WHITE_LIST
 } = process.env;
 
 export default {
@@ -36,5 +37,8 @@ export default {
     maxInInterval: THROTTLER_MAX || 5, // max number of allowed requests from 1 IP in "interval" time window
     minDifference: THROTTLER_MIN_DIFF || 0, // optional, minimum time between 2 requests from 1 IP
     whiteList: THROTTLER_WHITE_LIST ? THROTTLER_WHITE_LIST.split(',') : [] // requests from these IPs won't be throttled
+  },
+  tenant: {
+    whitelist: TENANT_WHITE_LIST ? TENANT_WHITE_LIST.split(',') : []
   }
 };
