@@ -27,6 +27,7 @@ describe('Tenants', () => {
         expect(res.body.login).to.equal('tenant:test@test.com');
         expect(res.body).to.have.property('id');
         expect(res.body).to.not.have.property('passwordHash');
+        expect(res.body).to.not.have.property('password');
         done();
       });
     });

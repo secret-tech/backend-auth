@@ -146,6 +146,8 @@ describe('Authenticate', () => {
         postRequest('/auth/verify').send({ token }).end((err, res) => {
           expect(res.body).to.be.a('object');
           expect(res.body.decoded).to.be.a('object');
+          expect(res.body.decoded).to.not.have.property('passwordHash');
+          expect(res.body.decoded).to.not.have.property('password');
           done();
         });
       });

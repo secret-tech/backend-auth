@@ -41,6 +41,8 @@ describe('Users', () => {
       const params = { email: 'test@test.com', login: 'test', password: 'test', sub: '123' };
       postRequest('/user').send(params).end((err, res) => {
         expect(res.status).to.equal(200);
+        expect(res.body).to.not.have.property('passwordHash');
+        expect(res.body).to.not.have.property('password');
         done();
       });
     });
