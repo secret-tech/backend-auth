@@ -65,6 +65,7 @@ export class UserService implements UserServiceInterface {
       sub
     };
     await this.storageService.set(key, JSON.stringify(data));
+    delete data.password;
     return data;
   }
 
