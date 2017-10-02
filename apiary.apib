@@ -28,11 +28,15 @@ Common workflow is following:
 
 ### Register new tenant [POST]
 
++ email `test@test.com` (string, required, email)
+
++ password `passwordA6` (string, required, min: 6, regex: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$)
+
 + Request (application/json)
 
         {
             "email": "test@test.com",
-            "password": "password"
+            "password": "passwordA6"
         }
 
 + Response 200 (application/json)
@@ -45,6 +49,10 @@ Common workflow is following:
 ## Login tenant to create new JWT token [/tenant/login]
 
 ### Login tenant [POST]
+
++ email `test@test.com` (string, required, email)
+
++ password `passwordA6` (string, required, min: 6, regex: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$)
 
 + Request (application/json)
 
@@ -63,6 +71,8 @@ Common workflow is following:
 
 ### Logout tenant [POST]
 
++ accessToken `jwt` (string, required)
+
 + Request (application/json)
 
         {
@@ -78,6 +88,8 @@ Common workflow is following:
 ## Verify tenant's JWT token [/tenant/verify]
 
 ### Verify tenant's token [POST]
+
++ token `jwt` (string, required)
 
 + Request (application/json)
 
@@ -126,12 +138,21 @@ or an object describing what operations user can perform with resources (e.g. {
 
 ###  Create new user [POST]
 
++ email `test@test.com` (string, required, email)
+
++ login `test@test.com` (string, required)
+
++ password `passwordA6` (string, required)
+
++ sub `Application specific subject, e.g. some ID in 3rd party service` (string, required)
+
++ scope `scope` (optional)
+
 + Request (application/json)
 
         {
             "email": "test@test.com",
             "login": "testuser",
-            "tenant": "tenant_id",
             "password": "password",
             "scope": "user_scope"
         }
@@ -142,7 +163,6 @@ or an object describing what operations user can perform with resources (e.g. {
             "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
             "login": "testuser",
             "email": "test@test.com",
-            "tenant": "tenant_id",
             "scope": "user_scope"
         }
 
@@ -168,12 +188,18 @@ or an object describing what operations user can perform with resources (e.g. {
 
 ### Login [POST]
 
++ login `login` (string, required)
+
++ password `passwordA6` (string, required)
+
++ deviceId `someId` (string, required)
+
 + Request (application/json)
 
         {
-            "login": "tenant_id:test@test.com",
+            "login": "user_login",
             "password": "password_hash",
-            "scope": "user_scope"
+            "deviceId": "id"
         }
 
 + Response 200 (application/json)
@@ -229,6 +255,8 @@ or an object describing what operations user can perform with resources (e.g. {
 
 ### Verify [POST]
 
++ token `token` (string, required)
+
 + Request (application/json)
 
         {
@@ -258,6 +286,8 @@ or an object describing what operations user can perform with resources (e.g. {
 ## Logout [/auth/logout]
 
 ### Logout [POST]
+
++ token `token` (string, required)
 
 + Request (application/json)
 
