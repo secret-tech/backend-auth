@@ -28,11 +28,15 @@ Common workflow is following:
 
 ### Register new tenant [POST]
 
++ email `test@test.com` (string, required, email)
+
++ password `passwordA6` (string, required, min: 6, regex: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$)
+
 + Request (application/json)
 
         {
             "email": "test@test.com",
-            "password": "password"
+            "password": "passwordA6"
         }
 
 + Response 200 (application/json)
@@ -46,6 +50,10 @@ Common workflow is following:
 
 ### Login tenant [POST]
 
++ email `test@test.com` (string, required, email)
+
++ password `passwordA6` (string, required, min: 6, regex: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$)
+
 + Request (application/json)
 
         {
@@ -59,9 +67,11 @@ Common workflow is following:
             "accessToken": "jwt_token"
         }
 
-## Login tenant to invalidate JWT token [/tenant/logout]
+## Logout tenant to invalidate JWT token [/tenant/logout]
 
 ### Logout tenant [POST]
+
++ accessToken `jwt` (string, required)
 
 + Request (application/json)
 
@@ -73,6 +83,37 @@ Common workflow is following:
 
         {
             "result": 1
+        }
+
+## Verify tenant's JWT token [/tenant/verify]
+
+### Verify tenant's token [POST]
+
++ token `jwt` (string, required)
+
++ Request (application/json)
+
+        {
+            "token": "jwt_token"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "decoded": {
+                "id": "24d22df4-5709-4506-a974-646d78b519fb",
+                "login": "tenant:companies@jincor.com",
+                "jti": "24d22df4-5709-4506-a974-646d78b519fb1505744965000",
+                "iat": 1505744965000,
+                "aud": "jincor.com",
+                "isTenant": true
+            }
+        }
+
++ Response 400 (application/json)
+
+        {
+            "error": "invalid token"
         }
 
 # Group User
@@ -97,12 +138,22 @@ or an object describing what operations user can perform with resources (e.g. {
 
 ###  Create new user [POST]
 
++ email `test@test.com` (string, required, email)
+
++ login `test@test.com` (string, required)
+
++ password `passwordA6` (string, required)
+
++ sub `Application specific subject, e.g. some ID in 3rd party service` (string, required)
+
++ scope `scope` (optional)
+
 + Request (application/json)
 
         {
             "email": "test@test.com",
-            "tenant": "tenant_id",
-            "password": "password_hash",
+            "login": "testuser",
+            "password": "password",
             "scope": "user_scope"
         }
 
@@ -110,10 +161,8 @@ or an object describing what operations user can perform with resources (e.g. {
 
         {
             "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
-            "login": "tenant_id:test@test.com",
-            "password": "$2a$10$vVYXAgrX1ZRpa760frwwxuTTU/plkza0JUF09uUFyGxrHz7ItCw8y",
+            "login": "testuser",
             "email": "test@test.com",
-            "tenant": "tenant_id",
             "scope": "user_scope"
         }
 
@@ -139,12 +188,18 @@ or an object describing what operations user can perform with resources (e.g. {
 
 ### Login [POST]
 
++ login `login` (string, required)
+
++ password `passwordA6` (string, required)
+
++ deviceId `someId` (string, required)
+
 + Request (application/json)
 
         {
-            "login": "tenant_id:test@test.com",
+            "login": "user_login",
             "password": "password_hash",
-            "scope": "user_scope"
+            "deviceId": "id"
         }
 
 + Response 200 (application/json)
@@ -167,16 +222,40 @@ or an object describing what operations user can perform with resources (e.g. {
             "status": 404
         }
 
-+ Response 400 (application/json)
++ Response 422 (application/json)
 
         {
-            "error": "login, password and deviceId are required parameters",
-            "status": 400
+            "error": {
+                "isJoi": true,
+                "name": "ValidationError",
+                "details": [
+                    {
+                        "message": "\"password\" length must be at least 6 characters long",
+                        "path": "password",
+                        "type": "string.min",
+                        "context": {
+                            "limit": 6,
+                            "value": "test6",
+                            "key": "password"
+                        }
+                    }
+                ],
+                "_object": {
+                    "email": "companies@jincor",
+                    "password": "test6"
+                }
+            },
+            "value": {
+                "email": "companies@jincor",
+                "password": "test6"
+            }
         }
 
 ## Verify token [/auth/verify]
 
 ### Verify [POST]
+
++ token `token` (string, required)
 
 + Request (application/json)
 
@@ -207,6 +286,8 @@ or an object describing what operations user can perform with resources (e.g. {
 ## Logout [/auth/logout]
 
 ### Logout [POST]
+
++ token `token` (string, required)
 
 + Request (application/json)
 

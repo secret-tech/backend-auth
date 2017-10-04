@@ -2,10 +2,10 @@ version: '2'
 services:
 
   auth:
-    image: registry.jincor.com/backend/auth-develop:latest
+    image: registry.jincor.com/backend/auth:latest
     build:
         context: ./
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.prod
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -16,12 +16,10 @@ services:
     ports:
       - "3000"
       - "4000"
-    volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
     links:
       - redis
+
   redis:
-    image: redis:3.0.7-alpine
+    image: registry.jincor.com/backend/redis:latest
     ports:
       - "6379"

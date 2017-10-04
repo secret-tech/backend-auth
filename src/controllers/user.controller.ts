@@ -1,9 +1,9 @@
-import { Response } from 'express'
-import { AuthorizedRequest } from '../requests/authorized.request'
-import { UserServiceType, UserServiceInterface } from '../services/user.service'
-import { inject, injectable } from 'inversify'
-import {controller, httpDelete, httpPost} from 'inversify-express-utils'
-import 'reflect-metadata'
+import { Response } from 'express';
+import { AuthorizedRequest } from '../requests/authorized.request';
+import { UserServiceType, UserServiceInterface } from '../services/user.service';
+import { inject, injectable } from 'inversify';
+import { controller, httpDelete, httpPost } from 'inversify-express-utils';
+import 'reflect-metadata';
 
 /**
  * UserController
@@ -27,11 +27,11 @@ export class UserController {
     'CreateUserValidation'
   )
   async create(req: AuthorizedRequest, res: Response): Promise<void> {
-    const { email, login, password, scope, sub } = req.body
+    const { email, login, password, scope, sub } = req.body;
 
-    const result = await this.userService.create({ email, login, password, tenant: req.tenant.id, scope, sub })
+    const result = await this.userService.create({ email, login, password, tenant: req.tenant.id, scope, sub });
 
-    res.json(result)
+    res.json(result);
   }
 
   /**
@@ -42,16 +42,16 @@ export class UserController {
    * @param  res  express res object
    */
   @httpDelete(
-    '/:login',
+    '/:login'
   )
   async del(req: AuthorizedRequest, res: Response): Promise<void> {
-    const { login } = req.params
+    const { login } = req.params;
 
-    const key = this.userService.getKey(req.tenant.id, login)
-    const result = await this.userService.del(key)
+    const key = this.userService.getKey(req.tenant.id, login);
+    const result = await this.userService.del(key);
 
     result
         ? res.status(200).send({result: 1})
-        : res.status(404).send({error: 'Specified login does not exist or was already deleted.'})
+        : res.status(404).send({error: 'Specified login does not exist or was already deleted.'});
   }
 }
