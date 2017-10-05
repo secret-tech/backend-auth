@@ -34,7 +34,7 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 
 
 ## API Endpoints
-For more information, see [API Blueprint](https://jincortech.github.io/backend-auth/index.html)
+For more information, see [API Documentation](https://jincortech.github.io/backend-auth/index.html)
 
 1. `/user` POST - create a new user
 2. `/user/{login}` DELETE - delete specific user
