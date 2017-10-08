@@ -1,26 +1,26 @@
-import config from '../config'
-import * as jwt from 'jsonwebtoken'
-import { injectable } from 'inversify'
+import config from '../config';
+import * as jwt from 'jsonwebtoken';
+import { injectable } from 'inversify';
 
-const { algorithm, secret_separator, secret, expiration } = config.jwt
+const { algorithm, secretSeparator, secret, expiration } = config.jwt;
 
 type TokenUserData = {
   id: string,
   login: string,
   sub: string
-  scope?: any,
-}
+  scope?: any
+};
 
 type TokenTenantData = {
   id: string,
-  login: string,
-}
+  login: string
+};
 
 export interface JWTServiceInterface {
-  generateUserToken: (user: TokenUserData, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number) => any
-  generateTenantToken: (tenant: TokenTenantData, sessionKey: string, userKey: string, issuedAt: number) => string
-  verify: (token: string, userKey: string) => Promise<boolean>
-  decode: (token: string) => any
+  generateUserToken: (user: TokenUserData, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number) => any;
+  generateTenantToken: (tenant: TokenTenantData, sessionKey: string, userKey: string, issuedAt: number) => string;
+  verify: (token: string, userKey: string) => Promise<boolean>;
+  decode: (token: string) => any;
 }
 
 /**
@@ -28,16 +28,16 @@ export interface JWTServiceInterface {
  */
 @injectable()
 export class JWTService implements JWTServiceInterface {
-  private secret: string
-  private algorithm: string
-  private secret_separator: string
+  private secret: string;
+  private algorithm: string;
+  private secretSeparator: string;
   /**
    * Creates jwt service instance
    */
   constructor() {
-    this.secret = secret
-    this.algorithm = algorithm
-    this.secret_separator = secret_separator
+    this.secret = secret;
+    this.algorithm = algorithm;
+    this.secretSeparator = secretSeparator;
   }
 
   /**
@@ -52,10 +52,10 @@ export class JWTService implements JWTServiceInterface {
    * @return  generated token
    */
   generateUserToken(user: TokenUserData, deviceId: string, sessionKey: string, userKey: string, issuedAt: number, expiresIn?: number): any {
-    const { id, login, scope, sub } = user
+    const { id, login, scope, sub } = user;
 
     if (!expiresIn) {
-      expiresIn = expiration
+      expiresIn = expiration;
     }
 
     const payload = {
@@ -67,13 +67,12 @@ export class JWTService implements JWTServiceInterface {
       iat: issuedAt,
       sub,
       aud: 'jincor.com'
-    }
+    };
 
-    const secret = this.generateSecret(userKey)
-    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn})
-    return { token, expiresIn }
+    const secret = this.generateSecret(userKey);
+    const token = jwt.sign(payload, secret, {algorithm: this.algorithm, expiresIn});
+    return { token, expiresIn };
   }
-
 
   /**
    * Generate tenant's token
@@ -85,7 +84,7 @@ export class JWTService implements JWTServiceInterface {
    * @return  generated token
    */
   generateTenantToken(tenant: TokenTenantData, sessionKey: string, userKey: string, issuedAt: number): string {
-    const { id, login, } = tenant
+    const { id, login } = tenant;
 
     const payload = {
       id,
@@ -94,13 +93,12 @@ export class JWTService implements JWTServiceInterface {
       iat: issuedAt,
       aud: 'jincor.com',
       isTenant: true
-    }
+    };
 
-    const secret = this.generateSecret(userKey)
+    const secret = this.generateSecret(userKey);
 
-    return jwt.sign(payload, secret, {algorithm: this.algorithm})
+    return jwt.sign(payload, secret, {algorithm: this.algorithm});
   }
-
 
   /**
    * Verify token
@@ -110,20 +108,19 @@ export class JWTService implements JWTServiceInterface {
    * @return  promise
    */
   async verify(token: string, userKey: string): Promise<boolean> {
-    const secret = this.generateSecret(userKey)
+    const secret = this.generateSecret(userKey);
 
     try {
-      jwt.verify(token, secret, {algorithms: [this.algorithm]})
-      return true
+      jwt.verify(token, secret, {algorithms: [this.algorithm]});
+      return true;
     } catch (e) {
-      return false
+      return false;
     }
   }
 
   decode(token: string): any {
-    return jwt.decode(token)
+    return jwt.decode(token);
   }
-
 
   /**
    * Generate secret key
@@ -132,9 +129,9 @@ export class JWTService implements JWTServiceInterface {
    * @return generated secret
    */
   private generateSecret(userKey: string): string {
-    return this.secret + this.secret_separator + userKey
+    return this.secret + this.secretSeparator + userKey;
   }
 }
 
-const JWTServiceType = Symbol('JWTServiceInterface')
-export { JWTServiceType }
+const JWTServiceType = Symbol('JWTServiceInterface');
+export { JWTServiceType };

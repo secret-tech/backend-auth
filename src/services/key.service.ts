@@ -1,14 +1,14 @@
-import { StorageService, StorageServiceType } from './storage.service'
-import * as uuid from 'node-uuid'
-import { inject, injectable } from 'inversify'
-import { JWTServiceType, JWTServiceInterface } from './jwt.service'
+import { StorageService, StorageServiceType } from './storage.service';
+import * as uuid from 'node-uuid';
+import { inject, injectable } from 'inversify';
+import { JWTServiceType, JWTServiceInterface } from './jwt.service';
 
 export interface KeyServiceInterface {
-  get: (key: string) => Promise<string>
-  set: (user: any, deviceId: string) => Promise<string>
-  setTenantToken: (tenant: any) => Promise<string>
-  del: (key: string) => Promise<any>
-  verifyToken: (token: string) => Promise<any>
+  get: (key: string) => Promise<string>;
+  set: (user: any, deviceId: string) => Promise<string>;
+  setTenantToken: (tenant: any) => Promise<string>;
+  del: (key: string) => Promise<any>;
+  verifyToken: (token: string) => Promise<any>;
 }
 
 /**
@@ -24,9 +24,8 @@ export class KeyService implements KeyServiceInterface {
    */
   constructor(
     @inject(StorageServiceType) private client: StorageService,
-    @inject(JWTServiceType) private jwtService: JWTServiceInterface,
+    @inject(JWTServiceType) private jwtService: JWTServiceInterface
   ) { }
-
 
   /**
    * Returns user's key
@@ -35,9 +34,8 @@ export class KeyService implements KeyServiceInterface {
    * @return          Promise
    */
   get(key: string): Promise<string> {
-    return this.client.get(key)
+    return this.client.get(key);
   }
-
 
   /**
    * Generate and set user's key
@@ -47,16 +45,16 @@ export class KeyService implements KeyServiceInterface {
    * @return            Promise
    */
   async set(user: any, deviceId: string): Promise<string> {
-    const userKey = uuid.v4()
-    const issuedAt = Date.now()
+    const userKey = uuid.v4();
+    const issuedAt = Date.now();
 
-    const key = this.sessionKey(user.id, deviceId, issuedAt)
-    const { token, expiresIn } = this.jwtService.generateUserToken(user, deviceId, key, userKey, issuedAt)
+    const key = this.sessionKey(user.id, deviceId, issuedAt);
+    const { token, expiresIn } = this.jwtService.generateUserToken(user, deviceId, key, userKey, issuedAt);
 
-    await this.client.set(key, userKey)
-    await this.client.expire(key, expiresIn)
+    await this.client.set(key, userKey);
+    await this.client.expire(key, expiresIn);
 
-    return token
+    return token;
   }
 
   /**
@@ -66,15 +64,15 @@ export class KeyService implements KeyServiceInterface {
    * @return            Promise
    */
   async setTenantToken(tenant: any): Promise<string> {
-    const userKey = uuid.v4()
-    const issuedAt = Date.now()
+    const userKey = uuid.v4();
+    const issuedAt = Date.now();
 
-    const key = this.tenantSessionKey(tenant.id, issuedAt)
-    const token = this.jwtService.generateTenantToken(tenant, key, userKey, issuedAt)
+    const key = this.tenantSessionKey(tenant.id, issuedAt);
+    const token = this.jwtService.generateTenantToken(tenant, key, userKey, issuedAt);
 
-    await this.client.set(key, userKey)
+    await this.client.set(key, userKey);
 
-    return token
+    return token;
   }
 
   /**
@@ -84,19 +82,19 @@ export class KeyService implements KeyServiceInterface {
    * @return      Promise
    */
   del(key: string): Promise<any> {
-    return this.client.del(key)
+    return this.client.del(key);
   }
 
   async verifyToken(token: string): Promise<any> {
-    const decoded = this.jwtService.decode(token)
+    const decoded = this.jwtService.decode(token);
 
     if (!decoded) {
-      return { valid: false }
+      return { valid: false };
     }
 
-    const userKey = await this.get(decoded.jti)
-    const valid = await this.jwtService.verify(token, userKey)
-    return { valid, decoded }
+    const userKey = await this.get(decoded.jti);
+    const valid = await this.jwtService.verify(token, userKey);
+    return { valid, decoded };
   }
 
   /**
@@ -108,7 +106,7 @@ export class KeyService implements KeyServiceInterface {
    * @return           session key
    */
   private sessionKey(userId: string, deviceId: string, issuedAt: number): string {
-    return userId + deviceId + issuedAt.toString()
+    return userId + deviceId + issuedAt.toString();
   }
 
   /**
@@ -119,9 +117,9 @@ export class KeyService implements KeyServiceInterface {
    * @return           session key
    */
   private tenantSessionKey(userId: string, issuedAt: number): string {
-    return userId + issuedAt.toString()
+    return userId + issuedAt.toString();
   }
 }
 
-const KeyServiceType = Symbol('KeyServiceInterface')
-export { KeyServiceType }
+const KeyServiceType = Symbol('KeyServiceInterface');
+export { KeyServiceType };

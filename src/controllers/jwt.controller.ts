@@ -1,11 +1,11 @@
-import { Response, NextFunction } from 'express'
-import { AuthorizedRequest } from '../requests/authorized.request'
-import * as bcrypt from 'bcrypt-nodejs'
+import { Response, NextFunction } from 'express';
+import { AuthorizedRequest } from '../requests/authorized.request';
+import * as bcrypt from 'bcrypt-nodejs';
 
-import { KeyServiceType, KeyServiceInterface } from '../services/key.service'
-import { UserServiceType, UserServiceInterface } from '../services/user.service'
-import { inject, injectable } from 'inversify'
-import { controller, httpPost } from 'inversify-express-utils'
+import { KeyServiceType, KeyServiceInterface } from '../services/key.service';
+import { UserServiceType, UserServiceInterface } from '../services/user.service';
+import { inject, injectable } from 'inversify';
+import { controller, httpPost } from 'inversify-express-utils';
 
 /**
  * JWTController
@@ -18,7 +18,7 @@ import { controller, httpPost } from 'inversify-express-utils'
 export class JWTController {
   constructor(
     @inject(KeyServiceType) private keyService: KeyServiceInterface,
-    @inject(UserServiceType) private userService: UserServiceInterface,
+    @inject(UserServiceType) private userService: UserServiceInterface
   ) { }
 
   /**
@@ -34,37 +34,37 @@ export class JWTController {
   )
   async create(req: AuthorizedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { login, password, deviceId } = req.body
+      const { login, password, deviceId } = req.body;
 
-      const key = this.userService.getKey(req.tenant.id, login)
-      const userStr = await this.userService.get(key)
+      const key = this.userService.getKey(req.tenant.id, login);
+      const userStr = await this.userService.get(key);
 
       if (!userStr) {
         res.status(404).send({
           error: 'User does not exist',
           status: 404
-        })
-        return
+        });
+        return;
       }
 
-      const user = JSON.parse(userStr)
-      const passwordMatch = bcrypt.compareSync(password, user.password)
+      const user = JSON.parse(userStr);
+      const passwordMatch = bcrypt.compareSync(password, user.password);
 
       if (!passwordMatch) {
         res.status(403).send({
           error: 'Incorrect password',
           status: 403
-        })
-        return
+        });
+        return;
       }
 
-      const token = await this.keyService.set(user, deviceId)
+      const token = await this.keyService.set(user, deviceId);
 
       res.status(200).send({
         accessToken: token
-      })
+      });
     } catch (e) {
-      next(e)
+      next(e);
     }
   }
 
@@ -79,17 +79,17 @@ export class JWTController {
     'TokenRequiredValidation'
   )
   async verify(req: AuthorizedRequest, res: Response): Promise<void> {
-    const { token } = req.body
-    const { valid, decoded } = await this.keyService.verifyToken(token)
+    const { token } = req.body;
+    const { valid, decoded } = await this.keyService.verifyToken(token);
 
     if (!valid) {
       res.status(400).send({
         error: 'invalid token'
-      })
-      return
+      });
+      return;
     }
 
-    res.send({ decoded })
+    res.send({ decoded });
   }
 
   /**
@@ -103,20 +103,20 @@ export class JWTController {
     'TokenRequiredValidation'
   )
   async logout(req: AuthorizedRequest, res: Response): Promise<void> {
-    const { token } = req.body
-    const { valid, decoded } = await this.keyService.verifyToken(token)
+    const { token } = req.body;
+    const { valid, decoded } = await this.keyService.verifyToken(token);
 
     if (!valid) {
       res.status(400).send({
         error: 'invalid token'
-      })
-      return
+      });
+      return;
     }
 
-    const result = await this.keyService.del(decoded.jti)
+    const result = await this.keyService.del(decoded.jti);
 
     result
         ? res.status(200).send({ result: result })
-        : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' })
+        : res.status(404).send({ error: 'Session does not exist or has expired. Please sign in to continue.' });
   }
 }
