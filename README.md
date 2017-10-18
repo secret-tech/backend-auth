@@ -1,4 +1,5 @@
 # Jincor Auth
+![](https://travis-ci.org/JincorTech/backend-auth.svg?branch=master)
 ![](https://habrastorage.org/webt/59/d5/42/59d542206afbe280817420.png)
 
 ## Why
