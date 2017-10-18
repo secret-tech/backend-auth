@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker-compose build
+  - docker-compose up -d
+  - docker-compose ps
+
+script:
+  - docker-compose run --rm auth sh -c "npm test"
