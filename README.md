@@ -1,11 +1,20 @@
 # Jincor Auth
-![Jincor logo](https://raw.githubusercontent.com/JincorTech/backend-auth/master/Logo.png)
+![](https://travis-ci.org/JincorTech/backend-auth.svg?branch=master)
+![](https://habrastorage.org/webt/59/d5/42/59d542206afbe280817420.png)
 
-Jincor Auth is a service that manages JWT-authentication, it's main responsibilities are:
+## Why
+There are a lot of authentication services. But we were looking for a containerized simple to use solution
+with multi tenancy support and suitable for both: user authentication and services/tenants authentication.
 
-1. Users management.
-2. Generation of JWT tokens.
-3. Validation of JWT tokens.
+Tenant is a user of the system permitted to read and write to database in its scope. If you don't need multi tenancy support, just create 1 tenant and add all users to it.
+
+Service responsibilities
+
+1. Tenant management
+1. User management
+2. Generation of JWT tokens
+3. Validation of JWT tokens
+4. Authentication
 
 ## How does it work
 Jincor Auth service registers users with their username(login/email), company and tenant ID(for multi tenancy support).
@@ -26,7 +35,28 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 
 
 ## API Endpoints
-For more information, see [API Blueprint](./apiary.apib)
+For more information, see [API Documentation](https://jincortech.github.io/backend-auth/index.html)
+
+1. `/tenant` POST - register a tenant.
+1. `/tenant/login` POST - login a tenant.
+1. `/tenant/logout` POST - logout a tenant.
+1. `/tenant/verify` POST - verify tenant's JWT token.
+1. `/user` POST - create a new user.
+1. `/user/{login}` DELETE - delete specific user.
+1. `/auth/` POST - log user in.
+1. `/auth/verify` POST - verify the given token.
+1. `/auth/logout` POST - logout user.
+
+## How to build
+
+### For development
+
+1. Clone this repo.
+1. Run `docker-compose build --no-cache`.
+1. Start development containers: `docker-compose up -d`.
+1. If you want to update/install dependency run: `docker-compose exec auth npm i some-dep`.
+IMPORTANT: To keep your changes in container you have to commit it: `docker commit registry.jincor.com/backend/auth-develop:latest`.
+1. To run tests run `docker-compose exec auth npm test`
 
 1. `/tenant` POST - register a tenant.
 1. `/tenant/login` POST - login a tenant.

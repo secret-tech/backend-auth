@@ -1,0 +1,19 @@
+sudo: required
+services:
+- docker
+before_install:
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- chmod ugo+x ./build.sh
+- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ];  then echo "production"; elif ["$TRAVIS_BRANCH"
+  == "develop"]; then echo "stage"; else echo "dev-$(git rev-parse --short HEAD)"
+  ; fi`
+- "./build.sh $TAG"
+script:
+- docker-compose run --rm auth sh -c "npm test"
+notifications:
+  slack:
+    secure: gYjkAyEVN6kAVw3bHAWACuGDoZgEgsE6irhvIBHHQKGD6blkw4zSABqxriDspwaOiIE1cjBLS499SwzIv4dUL+KxuJy2RkQ1a09KvXb85hHJmMQ412g06Gzv/5CaoocQzSbKyylhXCSKwUyXdUB1NVJtDw6Pyvwo9LN7hwBDPW1HC50xewTSpt/nSyspXBAC0NoJRgR0k7dieZVzdZvnO9JTNQ9vxjf+m9nsF2PFK547PFySKIgsf4rFpdEgw6bF5r8xgv4Hmeqs4wz5aXXe3zGzxMgY+Qsa6wwxDg8DMi0WyHMm/exlewABrvm+R7EglboA0RbdP1yBdiNLkY6HGjAlkZqNRjvVWyNCXdvVBj72eOI/08ZShq3Z2UoQ6pgPFUoXStBb6ebar/b6E47pQrLO2g8fEDo3WYW7ewdKVMbHumkKICh7GuJHQNBFTH5uCfQj+IRHZ4J+euXktPo4J2yox0MnXSueaJcFKlLlD3rVAi+bqpfgcAQuhwPetXXgNFx+cLDD7uan06fdtRrDYW5uQ23ly/E2DTchglKswPYdfHEncW0H2dP7tQtQNdGk0vTJdrfYt530cLLN6d8enzjgwIK9/TQiJjEEX24EBRbMrieVAUU7NRIpOTI+VKr4S+MvX7C6TuzWB5xig6RIHTm36k+xQ4Zp98a0r6umT24=
+env:
+  global:
+  - secure: kz0/9ZfBMa8y40+xRLW4GB+NdUwPLSssghDmdvQTwXDWM8oQUTaYJv9pp/B70CVvsbKtQTGGsT4a5FXpdUEBi8YI76EiMoaFrMrnRasbeyhdKkwwzzu0o7N0FJR1QehfRdwyaVU01P5EiXfJa5lWxIqEIhoTJOi6JaE8M/zY80OhJVUYHyIyazSUHu+PwEbNazZ7jtokpzr4Re+5Dsiq1aLYlfAMkmE+04OQl71h848jfXkrqQ9im2ktjGURy/gfSNOm3zhkKLOwazw53GJWjMEr/b6FaWK9liH3tIsXEtgzzyO/udy5uwIgMPKpYGG+Pyb6dR0G3fTu/Hy1+MEacR9rn0sdC+qIjEwkdLjvuKXbCrNdRVVIE8EyYr78Vvqm9yVM7QUaCp1/R7wuMOiLq4r4fRrTmTAyCPUQ0ngyqxym9H5RqvO1TRzmKwEmjXjMsYouV1odRm9R7kh0ndPkxe9SGZbF6Nds0DlFc6ncwupgLFWSvrOgxtNQ4TSp3MIISEq+LOAwSbAF5knlryEgy9EHvYJYhKuzlxwbvZ0zyqC2uyoxLLMA9IjvPkWZKlc9f9Z+uSLblwkChg/W//DawO5d7aBhJ5wYsp+h532Iyt5JXkXvn/6YQJKFd0tmEmFFw/KH1RvrkMQAhjag4JNpiQYPUU4V14QSSP6DlJxJa7k=
+  - secure: lAwccmMSLItYYd6cpILYYQOKm+sID2yq4Oxmutcwr/qmMSW++zVtNbI2iQ5DXGkoPmyxnwdQubBJrSoCBRdGAq9p2g5Mh2d1QWBTE12Xy0/kc2lvSIV5tum4sDdIoEsIJT3PENxhDB1U2rTjoBBesXCcf4+E//etT9kArFjU/qfkgFQEnehA/HzG4iauuHn4ctInAimrxQYY9R6MeFyn4VnkYRQM8/O7WU/5vrnJnXNtAghMq5uxnMDZ+Ok04V0NLh5R7p1vUthxIGH1PTiECSL9QtTg8KGk3K3214EmMu+bScRobOP0LQOv8ayhN8S3p+zSFFJ95GxB38Ite0x6c6AfDZimMMtIS+DqCyPrR66zMOPDiXk211M3JpjHQs+U/89dn2MMwJFx4g4MUxH6142xZFHm+9s9p8EPc3284ifE4VCF1mAfdHtSSXxdUVOIKchjwObjCoqBNYKi2PyyreR8HRpRrXAQ9mTQgBkYmA5dJXQU9MxHRXe/SbgUPTGPQPO57+XRvFXybZePP69NBHvCtHigEIP37XbRpNorMEmsx8SgWmmPJRlqVMzcbgWQ/xuCNUk8hT82szHlKR4GvXlheZky681PcvJUgxmCbTF07x0+WCs0VUfCUTirI5TbCVPJxcDdToncNE5aA0gVOHcX21mkYlHijkhhWzrkCZU=
