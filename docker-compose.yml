@@ -2,11 +2,7 @@ version: '2'
 services:
 
   auth:
-<<<<<<< HEAD
-    image: registry.jincor.com/backend/auth-develop:latest
-=======
     image: jincort/backend-auth
->>>>>>> master
     build:
         context: ./
         dockerfile: Dockerfile
