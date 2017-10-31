@@ -2,7 +2,7 @@ version: '2'
 services:
 
   auth:
-    image: registry.jincor.com/backend/auth:latest
+    image: jincort/backend-auth
     build:
         context: ./
         dockerfile: Dockerfile.prod
@@ -20,6 +20,6 @@ services:
       - redis
 
   redis:
-    image: registry.jincor.com/backend/redis:latest
+    image: jincort/backend-redis
     ports:
       - "6379"
