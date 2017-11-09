@@ -1,6 +1,6 @@
 auth:
   build:
-      image: registry.heroku.com/jincort/backend-auth
+      image: registry.heroku.com/backend-auth
       context: ./
       dockerfile: Dockerfile.prod
   encrypted_env_file: .env.prod.encrypted
