@@ -24,6 +24,10 @@ export default class IpWhiteListFilter {
       ip = ip.substr(7);
     }
 
+    if(this.whiteList.indexOf('*') !== -1) {
+      return next();
+    }
+
     if (this.whiteList.indexOf(ip) !== -1) {
       return next();
     }
