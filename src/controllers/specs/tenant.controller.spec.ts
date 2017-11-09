@@ -103,35 +103,36 @@ describe('Tenants', () => {
   describe('POST /tenant/login', () => {
     it('should authenticate tenant', (done) => {
       const tenant = {email: 'test@test.com', password: 'testA6' };
-      tenantService.create(tenant);
-      request(app).post('/tenant/login').set('Accept', 'application/json').send(tenant).end((err, res) => {
-        expect(res.status).to.equal(200);
-        expect(res.body).to.have.property('accessToken');
-        done();
+      tenantService.create(tenant).then(() => {
+        request(app).post('/tenant/login').set('Accept', 'application/json').send(tenant).end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('accessToken');
+          done();
+        });
       });
     });
 
     it('should not authenticate tenant with incorrect password', (done) => {
       const tenant = {email: 'test@test.com', password: 'testA6' };
-      tenantService.create(tenant);
-
-      const params = {email: 'test@test.com', password: 'testA61' };
-      request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
-        expect(res.status).to.equal(500);
-        expect(res.body.error).to.equal('Password is incorrect');
-        done();
+      tenantService.create(tenant).then(() => {
+        const params = {email: 'test@test.com', password: 'testA61' };
+        request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.error).to.equal('Password is incorrect');
+          done();
+        });
       });
     });
 
     it('should not authenticate tenant with incorrect email', (done) => {
       const tenant = { email: 'test@test.com', password: 'test' };
-      tenantService.create(tenant);
-
-      const params = { email: 'test1@test.com', password: 'testA6' };
-      request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
-        expect(res.status).to.equal(500);
-        expect(res.body.error).to.equal('Tenant is not found');
-        done();
+      tenantService.create(tenant).then(() => {
+        const params = { email: 'test1@test.com', password: 'testA6' };
+        request(app).post('/tenant/login').set('Accept', 'application/json').send(params).end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.error).to.equal('Tenant is not found');
+          done();
+        });
       });
     });
 

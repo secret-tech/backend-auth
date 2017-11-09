@@ -8,12 +8,14 @@ export default class IpWhiteListFilter {
    * @param whiteList Array<string>
    */
   constructor(whiteList: Array<string>) {
+    for (var i = 0; i < whiteList.length; i++) {
+      whiteList[i] = whiteList[i].replace(/"/g, '');
+    }
     this.whiteList = whiteList;
   }
 
   filter(req: Request, res: Response, next: NextFunction) {
     let ip = req.ip;
-
     /*
      Check if IP has ipv6 prefix and remove it.
      See: https://stackoverflow.com/questions/29411551/express-js-req-ip-is-returning-ffff127-0-0-1

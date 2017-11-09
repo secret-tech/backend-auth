@@ -1,0 +1,9 @@
+auth:
+  build:
+      image: jincort/backend-auth
+      context: ./
+      dockerfile: Dockerfile.prod
+  encrypted_env_file: .env.prod.encrypted
+  volumes:
+    - ./:/usr/src/app
+    - /usr/src/app/node_modules
