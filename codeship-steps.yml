@@ -4,6 +4,6 @@
 - name: deploy
   service: auth
   type: push
-  image_name: registry.heroku.com/backend-auth
+  image_name: registry.heroku.com/polar-dawn-39533/web
   registry: registry.heroku.com
   dockercfg_service: dockercfg_generator

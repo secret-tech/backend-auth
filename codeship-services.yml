@@ -1,6 +1,6 @@
 auth:
   build:
-      image: registry.heroku.com/backend-auth
+      image: registry.heroku.com/polar-dawn-39533/web
       context: ./
       dockerfile: Dockerfile.prod
   encrypted_env_file: .env.prod.encrypted
