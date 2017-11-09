@@ -7,3 +7,14 @@ auth:
   volumes:
     - ./:/usr/src/app
     - /usr/src/app/node_modules
+
+herokudeployment:
+  image: codeship/heroku-deployment
+  encrypted_env_file: deployment.env.encrypted
+  volumes:
+    - ./:/deploy
+
+dockercfg_generator:
+  image: codeship/heroku-dockercfg-generator
+  add_docker: true
+  encrypted_env_file: deployment.env.encrypted

@@ -6,5 +6,6 @@ dist
 ts-node
 .idea
 
+deployment.env
 .env.prod
 codeship.aes

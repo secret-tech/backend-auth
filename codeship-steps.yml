@@ -1,3 +1,9 @@
 - name: test
   service: auth
   command: npm test
+- name: deploy
+  service: auth
+  type: push
+  image_name: registry.heroku.com/jincort/backend-auth
+  registry: registry.heroku.com
+  dockercfg_service: dockercfg_generator
