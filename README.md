@@ -1,5 +1,5 @@
 # Jincor Auth
-![](https://travis-ci.org/JincorTech/backend-auth.svg?branch=master)
+[ ![Codeship Status for JincorTech/backend-auth](https://app.codeship.com/projects/424d2bc0-a750-0135-bed6-1e9510c95f82/status?branch=master)](https://app.codeship.com/projects/255790)
 ![](https://habrastorage.org/webt/59/d5/42/59d542206afbe280817420.png)
 
 ## Why
