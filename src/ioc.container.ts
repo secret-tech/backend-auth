@@ -15,11 +15,12 @@ import * as validation from './middlewares/request.validation';
 import IpWhiteListFilter from './middlewares/ip.whitelist';
 
 let container = new Container();
+// let storage = new RedisService();
 
 // services
 container.bind<KeyServiceInterface>(KeyServiceType).to(KeyService);
 container.bind<JWTServiceInterface>(JWTServiceType).to(JWTService);
-container.bind<StorageService>(StorageServiceType).to(RedisService);
+container.bind<StorageService>(StorageServiceType).to(RedisService).inSingletonScope();
 container.bind<TenantServiceInterface>(TenantServiceType).to(TenantService);
 container.bind<UserServiceInterface>(UserServiceType).to(UserService);
 

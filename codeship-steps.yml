@@ -1,0 +1,10 @@
+- name: test
+  service: auth
+  command: npm test
+- name: deploy
+  service: auth
+  tag: master
+  type: push
+  image_name: registry.heroku.com/backend-auth/web
+  registry: registry.heroku.com
+  dockercfg_service: dockercfg_generator

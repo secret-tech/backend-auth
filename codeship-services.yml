@@ -1,0 +1,20 @@
+auth:
+  build:
+      image: registry.heroku.com/backend-auth/web
+      context: ./
+      dockerfile: Dockerfile.prod
+  encrypted_env_file: .env.prod.encrypted
+  volumes:
+    - ./:/usr/src/app
+    - /usr/src/app/node_modules
+
+herokudeployment:
+  image: codeship/heroku-deployment
+  encrypted_env_file: deployment.env.encrypted
+  volumes:
+    - ./:/deploy
+
+dockercfg_generator:
+  image: codeship/heroku-dockercfg-generator
+  add_docker: true
+  encrypted_env_file: deployment.env.encrypted
