@@ -1,6 +1,5 @@
 const {
-  REDIS_HOST,
-  REDIS_PORT,
+  REDIS_URL,
   REDIS_PASSWORD,
   PORT,
   HTTPS_PORT,
@@ -28,10 +27,8 @@ export default {
     secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
   },
   redis: {
-    port: parseInt(REDIS_PORT, 10) || 6379,
-    host: REDIS_HOST || 'localhost',
-    prefix: 'jincor_auth_',
-    password: REDIS_PASSWORD || ''
+    url: REDIS_URL || 'redis://redis:6379',
+    prefix: 'jincor_auth_'
   },
   throttler: {
     prefix: 'request_throttler_',
