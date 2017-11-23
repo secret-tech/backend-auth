@@ -73,10 +73,9 @@ IMPORTANT: To keep your changes in container you have to commit it: `docker comm
 ### For development
 
 1. Clone this repo.
-1. Run `docker-compose build --no-cache`.
-1. Start development containers: `docker-compose up -d`.
-1. If you want to update/install dependency run: `docker-compose exec auth npm i some-dep`.
-IMPORTANT: To keep your changes in container you have to commit it: `docker commit registry.jincor.com/backend/auth-develop:latest`.
+1. Run `docker-compose build --no-cache`
+1. Start development containers: `docker-compose up -d`
+1. To install dependencies run: `docker-compose exec auth npm i`
 1. To run tests run `docker-compose exec auth npm test`
 
 ### For production
