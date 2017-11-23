@@ -7,8 +7,7 @@ services:
         context: ./
         dockerfile: Dockerfile.prod
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_URL: 'redis://redis:6379'
       FORCE_HTTPS: disabled
       JWT_KEY: "uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r"
       THROTTLER_WHITE_LIST: "127.0.0.1"

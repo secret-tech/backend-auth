@@ -5,7 +5,7 @@ import 'reflect-metadata';
 
 import config from '../config';
 
-const {redis: {port, host, prefix}} = config;
+const {redis: {url, prefix}} = config;
 
 export interface StorageService {
   client: RedisClient;
@@ -21,7 +21,7 @@ export class RedisService implements StorageService {
   client: RedisClient;
 
   constructor() {
-    this.client = redis.createClient(port, host);
+    this.client = redis.createClient(url);
   }
 
   flushdb(): Promise<{}> {

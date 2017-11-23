@@ -2,14 +2,16 @@ sudo: required
 services:
 - docker
 before_install:
+- docker-compose build --no-cache
+- docker-compose run --rm auth sh -c "npm i"
+script:
+- docker-compose run --rm auth sh -c "npm test"
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
 - chmod ugo+x ./build.sh
 - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ];  then echo "production"; elif ["$TRAVIS_BRANCH"
   == "develop"]; then echo "stage"; else echo "dev-$(git rev-parse --short HEAD)"
   ; fi`
 - "./build.sh $TAG"
-script:
-- docker-compose run --rm auth sh -c "npm test"
 notifications:
   slack:
     secure: gYjkAyEVN6kAVw3bHAWACuGDoZgEgsE6irhvIBHHQKGD6blkw4zSABqxriDspwaOiIE1cjBLS499SwzIv4dUL+KxuJy2RkQ1a09KvXb85hHJmMQ412g06Gzv/5CaoocQzSbKyylhXCSKwUyXdUB1NVJtDw6Pyvwo9LN7hwBDPW1HC50xewTSpt/nSyspXBAC0NoJRgR0k7dieZVzdZvnO9JTNQ9vxjf+m9nsF2PFK547PFySKIgsf4rFpdEgw6bF5r8xgv4Hmeqs4wz5aXXe3zGzxMgY+Qsa6wwxDg8DMi0WyHMm/exlewABrvm+R7EglboA0RbdP1yBdiNLkY6HGjAlkZqNRjvVWyNCXdvVBj72eOI/08ZShq3Z2UoQ6pgPFUoXStBb6ebar/b6E47pQrLO2g8fEDo3WYW7ewdKVMbHumkKICh7GuJHQNBFTH5uCfQj+IRHZ4J+euXktPo4J2yox0MnXSueaJcFKlLlD3rVAi+bqpfgcAQuhwPetXXgNFx+cLDD7uan06fdtRrDYW5uQ23ly/E2DTchglKswPYdfHEncW0H2dP7tQtQNdGk0vTJdrfYt530cLLN6d8enzjgwIK9/TQiJjEEX24EBRbMrieVAUU7NRIpOTI+VKr4S+MvX7C6TuzWB5xig6RIHTm36k+xQ4Zp98a0r6umT24=

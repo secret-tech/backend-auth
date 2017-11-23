@@ -23,8 +23,8 @@ export class RequestThrottler {
    * @param options
    */
   constructor(options?) {
-    const { redis: { port, host } } = config;
-    const redisClient = redis.createClient(port, host);
+    const { redis: { url } } = config;
+    const redisClient = redis.createClient(url);
 
     if (!options) {
       options = defaultOptions;
