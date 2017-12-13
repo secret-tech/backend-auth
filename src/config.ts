@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 const {
   REDIS_URL,
   REDIS_PASSWORD,
