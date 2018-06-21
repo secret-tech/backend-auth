@@ -6,6 +6,7 @@ import { StorageServiceType, StorageService } from '../../services/storage.servi
 import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service';
 import * as express from 'express';
 import { InversifyExpressServer } from 'inversify-express-utils';
+import { cleanUpMetadata } from 'inversify-express-utils';
 
 chai.use(require('chai-http'));
 const { expect, request } = chai;
@@ -14,6 +15,10 @@ const tenantService = container.get<TenantServiceInterface>(TenantServiceType);
 const storageService = container.get<StorageService>(StorageServiceType);
 
 describe('Tenants', () => {
+  beforeEach(async() => {
+    cleanUpMetadata();
+  });
+
   afterEach(async() => {
     await storageService.flushdb();
   });
