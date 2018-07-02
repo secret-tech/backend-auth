@@ -1,20 +1,20 @@
 import { Response } from 'express';
 import { AuthorizedRequest } from '../requests/authorized.request';
 import { UserServiceType, UserServiceInterface } from '../services/user.service';
-import { inject, injectable } from 'inversify';
+import { inject } from 'inversify';
 import { controller, httpDelete, httpPost } from 'inversify-express-utils';
-import 'reflect-metadata';
 
 /**
  * UserController
  */
-@injectable()
 @controller(
   '/user',
   'AuthMiddleware'
 )
 export class UserController {
-  constructor(@inject(UserServiceType) private userService: UserServiceInterface) { }
+  constructor(
+    @inject(UserServiceType) private userService: UserServiceInterface
+  ) { }
 
   /**
    * Create user
