@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import app from '../../app';
 import IpWhiteListFilter from '../../middlewares/ip.whitelist';
+import MaintainTenantFilter from '../../middlewares/maintain.tenant.or.whitelist';
 import { container } from '../../ioc.container';
 import { StorageServiceType, StorageService } from '../../services/storage.service';
 import { TenantServiceType, TenantServiceInterface } from '../../services/tenant.service';
@@ -86,8 +87,8 @@ describe('Tenants', () => {
     });
 
     it('should use tenant IP whitelist', (done) => {
-      container.rebind<express.RequestHandler>('TenantIpWhiteList').toConstantValue(
-        (req: any, res: any, next: any) => (new IpWhiteListFilter([])).filter(req, res, next)
+      container.rebind<express.RequestHandler>('CreateTenantValidation').toConstantValue(
+        (req: any, res: any, next: any) => (new MaintainTenantFilter(new IpWhiteListFilter([]))).filter(req, res, next)
       );
 
       // create new app with new TenantIpWhiteList binding.

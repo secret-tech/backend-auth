@@ -1,7 +1,19 @@
 FROM mhart/alpine-node:8.5
 
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
+
+COPY . .
+COPY custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+
+RUN chmod 755 /usr/local/bin/custom-entrypoint.sh && \
+    addgroup auth && \
+    adduser -D -H -G auth auth && \
+    npm i
+
 EXPOSE 3000
 EXPOSE 4000
-CMD npm start
+
+USER auth
+
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]
+CMD ["npm", "start"]
