@@ -12,7 +12,7 @@ import IpWhiteListFilter from './middlewares/ip.whitelist';
 import './controllers/jwt.controller';
 import './controllers/tenant.controller';
 import './controllers/user.controller';
-
+import MaintainTenantFilter from './middlewares/maintain.tenant.or.whitelist';
 
 let container = new Container();
 // let storage = new RedisService();
@@ -46,6 +46,9 @@ container.bind<express.RequestHandler>('TokenRequiredValidation').toConstantValu
 );
 container.bind<express.RequestHandler>('TenantIpWhiteList').toConstantValue(
   (req: any, res: any, next: any) => (new IpWhiteListFilter(config.tenant.whitelist)).filter(req, res, next)
+);
+container.bind<express.RequestHandler>('MaintainTenantFilter').toConstantValue(
+  (req: any, res: any, next: any) => (new MaintainTenantFilter(new IpWhiteListFilter(config.tenant.whitelist))).filter(req, res, next)
 );
 
 export { container };

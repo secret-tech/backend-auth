@@ -1,14 +1,19 @@
 FROM mhart/alpine-node:10
 
-RUN apk update && apk add bash && rm -rf /var/cache/apk/*
-
-RUN mkdir -p /usr/src/app
-ADD . /usr/src/app
-
 WORKDIR /usr/src/app
 
-RUN npm i
-RUN mkdir ./dist
-RUN npm run build
+COPY . .
+COPY custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 
-CMD npm run serve
+RUN chmod 755 /usr/local/bin/custom-entrypoint.sh && \
+    addgroup auth && \
+    adduser -D -H -G auth auth && \
+    apk add --update --no-cache bash && \
+    npm i && \
+    npm run build && \
+    npm i --production
+
+USER auth
+
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]
+CMD ["npm", "run", "serve"]

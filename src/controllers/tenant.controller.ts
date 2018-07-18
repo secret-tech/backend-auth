@@ -22,8 +22,8 @@ export class TenantController {
    */
   @httpPost(
     '/',
-    'TenantIpWhiteList',
-    'CreateTenantValidation'
+    'CreateTenantValidation',
+    'MaintainTenantFilter'
   )
   async create(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;
