@@ -7,7 +7,7 @@ COPY custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 
 RUN chmod 755 /usr/local/bin/custom-entrypoint.sh && \
     addgroup auth && \
-    adduser -D -H -G auth auth && \
+    adduser -D -G auth auth && \
     npm i
 
 EXPOSE 3000
