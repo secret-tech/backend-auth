@@ -3,16 +3,15 @@ import { TenantServiceInterface, TenantService, TenantServiceType } from './serv
 import { StorageServiceType, StorageService, RedisService } from './services/storage.service';
 import { KeyServiceType, KeyServiceInterface, KeyService } from './services/key.service';
 import { JWTServiceInterface, JWTServiceType, JWTService } from './services/jwt.service';
-import { JWTController } from './controllers/jwt.controller';
-import { TenantController } from './controllers/tenant.controller';
-import { UserController } from './controllers/user.controller';
-import { interfaces, TYPE } from 'inversify-express-utils';
 import { UserService, UserServiceInterface, UserServiceType } from './services/user.service';
 import { Auth } from './middlewares/auth';
 import config from './config';
 import * as express from 'express';
 import * as validation from './middlewares/request.validation';
 import IpWhiteListFilter from './middlewares/ip.whitelist';
+import './controllers/jwt.controller';
+import './controllers/tenant.controller';
+import './controllers/user.controller';
 import MaintainTenantFilter from './middlewares/maintain.tenant.or.whitelist';
 
 let container = new Container();
@@ -51,10 +50,5 @@ container.bind<express.RequestHandler>('TenantIpWhiteList').toConstantValue(
 container.bind<express.RequestHandler>('MaintainTenantFilter').toConstantValue(
   (req: any, res: any, next: any) => (new MaintainTenantFilter(new IpWhiteListFilter(config.tenant.whitelist))).filter(req, res, next)
 );
-
-// controllers
-container.bind<interfaces.Controller>(TYPE.Controller).to(JWTController).whenTargetNamed('JWTController');
-container.bind<interfaces.Controller>(TYPE.Controller).to(TenantController).whenTargetNamed('TenantController');
-container.bind<interfaces.Controller>(TYPE.Controller).to(UserController).whenTargetNamed('UserController');
 
 export { container };
