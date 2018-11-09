@@ -23,7 +23,7 @@ export default {
   jwt: {
     algorithm: 'HS256',
     secretSeparator: ':',
-    expiration: 604800,
+    expiration: JWT_KEY_EXP || 604800,
     secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
   },
   redis: {
