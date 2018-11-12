@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import { TenantServiceType, TenantServiceInterface } from '../services/tenant.service';
 import { KeyServiceInterface, KeyServiceType } from '../services/key.service';
-import { inject, injectable } from 'inversify';
+import { inject } from 'inversify';
 import { controller, httpPost } from 'inversify-express-utils';
 
 /**
  * TenantController
  */
-@injectable()
 @controller('/tenant')
 export class TenantController {
   constructor(
@@ -23,8 +22,8 @@ export class TenantController {
    */
   @httpPost(
     '/',
-    'TenantIpWhiteList',
-    'CreateTenantValidation'
+    'CreateTenantValidation',
+    'MaintainTenantFilter'
   )
   async create(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;

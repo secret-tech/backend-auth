@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as express from 'express';
 import { Response, Request, NextFunction, Application } from 'express';
 import * as bodyParser from 'body-parser';
@@ -47,9 +48,18 @@ const requestThrottler = new RequestThrottler();
 app.use((req: Request, res: Response, next: NextFunction) => requestThrottler.throttle(req, res, next));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // for test purpose
 let server = new InversifyExpressServer(container, null, null, app);
+
+server.setErrorConfig((app) => {
+  // 404 handler
+  app.use((req, res, next) => {
+    res.status(404).json({
+      error: 'Cannot ' + req.method + ' ' + req.url
+    });
+  });
+});
 
 export default server.build();
