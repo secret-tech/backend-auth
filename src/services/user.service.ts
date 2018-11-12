@@ -87,6 +87,7 @@ export class UserService implements UserServiceInterface {
           delete modifiedUser.tenant;
           return modifiedUser;
         });
+        console.log("Modified users: ", parsedUsers)
         return parsedUsers;
       });
     })
