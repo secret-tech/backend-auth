@@ -1,6 +1,7 @@
 # Jincor Auth
 [ ![Codeship Status for JincorTech/backend-auth](https://app.codeship.com/projects/424d2bc0-a750-0135-bed6-1e9510c95f82/status?branch=master)](https://app.codeship.com/projects/255790)
-![](https://habrastorage.org/webt/59/d5/42/59d542206afbe280817420.png)
+
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
 
 ## Why
 There are a lot of authentication services. But we were looking for a containerized simple to use solution
@@ -35,7 +36,7 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 
 
 ## API Endpoints
-For more information, see [API Documentation](https://jincortech.github.io/backend-auth/index.html)
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
 
 1. `/tenant` POST - register a tenant.
 1. `/tenant/login` POST - login a tenant.
@@ -61,4 +62,3 @@ For more information, see [API Documentation](https://jincortech.github.io/backe
 1. Clone this repo.
 1. Run `docker-compose -f docker-compose.prod.yml build --no-cache`.
 1. To start prod containers: `docker-compose -f docker-compose.prod.yml up -d`.
-1. Push to registry: `docker push registry.jincor.com/backend/auth:latest`.
