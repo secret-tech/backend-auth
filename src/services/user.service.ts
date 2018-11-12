@@ -77,14 +77,17 @@ export class UserService implements UserServiceInterface {
    * @return Promise
    */
   async listForTenant(tenantId: String): Promise<any> {
-    console.log(tenantId);
-    this.storageService.client.keys('*' + tenantId + ':*', async (err, keys) => {
-      console.log("I've got some keys here: ", keys, err)
+    this.storageService.client.keys('*' + tenantId + ':*', async (err, keys) => { 
       if (err) return [];
       this.storageService.client.mget(keys, (err, users) => {
         if (err) return [];
-        console.log('We got something here: ', users);
-        return users;
+        const parsedUsers = users.map((user) => {
+          const modifiedUser: UserData = JSON.parse(user);
+          delete modifiedUser.password;
+          delete modifiedUser.tenant;
+          return modifiedUser;
+        });
+        return parsedUsers;
       });
     })
   }
