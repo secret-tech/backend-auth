@@ -78,7 +78,7 @@ export class UserService implements UserServiceInterface {
    */
   async listForTenant(tenantId: String): Promise<any> {
     console.log(tenantId);
-    this.storageService.client.keys('*' + tenantId + ':', async (err, keys) => {
+    this.storageService.client.keys('*' + tenantId + ':*', async (err, keys) => {
       console.log("I've got some keys here: ", keys, err)
       if (err) return [];
       this.storageService.client.mget(keys, (err, users) => {
