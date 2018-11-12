@@ -40,6 +40,7 @@ export class UserController {
   )
   async listUsers(req: AuthorizedRequest, res: Response): Promise<void> {
     const result = await this.userService.listForTenant(req.tenant.id);
+    console.log("Heeeeeey1");
     res.json(result);
   }
 
