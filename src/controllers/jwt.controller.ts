@@ -4,13 +4,12 @@ import * as bcrypt from 'bcrypt-nodejs';
 
 import { KeyServiceType, KeyServiceInterface } from '../services/key.service';
 import { UserServiceType, UserServiceInterface } from '../services/user.service';
-import { inject, injectable } from 'inversify';
+import { inject } from 'inversify';
 import { controller, httpPost } from 'inversify-express-utils';
 
 /**
  * JWTController
  */
-@injectable()
 @controller(
   '/auth',
   'AuthMiddleware'

@@ -1,6 +1,7 @@
 # Jincor Auth
 [ ![Codeship Status for JincorTech/backend-auth](https://app.codeship.com/projects/424d2bc0-a750-0135-bed6-1e9510c95f82/status?branch=master)](https://app.codeship.com/projects/255790)
-![](https://habrastorage.org/webt/59/d5/42/59d542206afbe280817420.png)
+
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
 
 ## Why
 There are a lot of authentication services. But we were looking for a containerized simple to use solution
@@ -35,7 +36,7 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 
 
 ## API Endpoints
-For more information, see [API Documentation](https://jincortech.github.io/backend-auth/index.html)
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
 
 1. `/tenant` POST - register a tenant.
 1. `/tenant/login` POST - login a tenant.
@@ -52,34 +53,12 @@ For more information, see [API Documentation](https://jincortech.github.io/backe
 ### For development
 
 1. Clone this repo.
-1. Run `docker-compose build --no-cache`.
-1. Start development containers: `docker-compose up -d`.
-1. If you want to update/install dependency run: `docker-compose exec auth npm i some-dep`.
-IMPORTANT: To keep your changes in container you have to commit it: `docker commit registry.jincor.com/backend/auth-develop:latest`.
-1. To run tests run `docker-compose exec auth npm test`
-
-1. `/tenant` POST - register a tenant.
-1. `/tenant/login` POST - login a tenant.
-1. `/tenant/logout` POST - logout a tenant.
-1. `/tenant/verify` POST - verify tenant's JWT token.
-1. `/user` POST - create a new user.
-1. `/user/{login}` DELETE - delete specific user.
-1. `/auth/` POST - log user in.
-1. `/auth/verify` POST - verify the given token.
-1. `/auth/logout` POST - logout user.
-
-## How to build
-
-### For development
-
-1. Clone this repo.
-1. Run `docker-compose build --no-cache`
-1. Start development containers: `docker-compose up -d`
-1. To install dependencies run: `docker-compose exec auth npm i`
-1. To run tests run `docker-compose exec auth npm test`
+1. Run `$ docker-compose build --no-cache`
+1. Start development containers: `$ docker-compose run auth /bin/sh`
+1. To install dependencies run in container: `$ npm i`
+1. To run tests run in container `$ npm test`
 
 ### For production
 1. Clone this repo.
 1. Run `docker-compose -f docker-compose.prod.yml build --no-cache`.
 1. To start prod containers: `docker-compose -f docker-compose.prod.yml up -d`.
-1. Push to registry: `docker push registry.jincor.com/backend/auth:latest`.

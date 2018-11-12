@@ -1,3 +1,7 @@
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 const {
   REDIS_URL,
   REDIS_PASSWORD,
@@ -11,7 +15,11 @@ const {
   THROTTLER_MIN_DIFF,
   JWT_KEY_EXP,
   JWT_KEY,
-  TENANT_WHITE_LIST
+  TENANT_WHITE_LIST,
+  MAINTAIN_TLS_PORT,
+  MAINTAIN_TLS_PEM,
+  MAINTAIN_TLS_CA,
+  MAINTAIN_TLS_CA_CN
 } = process.env;
 
 export default {
@@ -39,6 +47,10 @@ export default {
     whiteList: THROTTLER_WHITE_LIST ? THROTTLER_WHITE_LIST.split(',') : [] // requests from these IPs won't be throttled
   },
   tenant: {
-    whitelist: TENANT_WHITE_LIST ? TENANT_WHITE_LIST.split(',') : []
+    whitelist: TENANT_WHITE_LIST ? TENANT_WHITE_LIST.split(',') : [],
+    maintainTlsPort: parseInt(MAINTAIN_TLS_PORT, 10) || 6000,
+    maintainTlsPem: MAINTAIN_TLS_PEM || '',
+    maintainTlsCa: MAINTAIN_TLS_CA || '',
+    maintainTlsCaCn: MAINTAIN_TLS_CA_CN || 'Auth Maintain'
   }
 };
