@@ -20,6 +20,21 @@ describe('userService', () => {
     });
   });
 
+  describe('#listForTenant', () => {
+    before(async() => {
+      const userOne = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123' };
+      const userTwo = { email: 'test1', login: 'test1', tenant: 'test', password: 'test', sub: '321' };
+      await userService.create(userOne);
+      await userService.create(userTwo);
+    });
+    
+    it('should list users by tenant id', async() => {
+      const result = await userService.listForTenant('test');
+      expect(result).to.be.an('array');
+      expect(result.length).to.equal(2);
+    });
+  });
+
   describe('#get', () => {
     before(async() => {
       const userData = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123' };
