@@ -15,6 +15,7 @@ type UserData = {
 
 export interface UserServiceInterface {
   get: (key: string) => Promise<string>;
+  listForTenant: (tenantId: String) => Promise<any>;
   create: (userData: UserData) => Promise<any>;
   del: (key: string) => Promise<any>;
   getKey: (tenant: string, login: string) => string;
@@ -67,6 +68,24 @@ export class UserService implements UserServiceInterface {
     await this.storageService.set(key, JSON.stringify(data));
     delete data.password;
     return data;
+  }
+
+  /**
+   * List users for specified tenant
+   * 
+   * @param tenantId string with id of tenant to list users for
+   * @return Promise
+   */
+  async listForTenant(tenantId: String): Promise<any> {
+    const keys = await this.storageService.keys('*' + tenantId + ':*');
+    const rawUsers = await this.storageService.mget(keys);
+    const parsedUsers = rawUsers.map((user) => {
+      const modifiedUser: UserData = JSON.parse(user);
+      delete modifiedUser.password;
+      delete modifiedUser.tenant;
+      return modifiedUser;
+    });
+    return parsedUsers;
   }
 
   /**

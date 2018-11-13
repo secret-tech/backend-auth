@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthorizedRequest } from '../requests/authorized.request';
 import { UserServiceType, UserServiceInterface } from '../services/user.service';
 import { inject } from 'inversify';
-import { controller, httpDelete, httpPost } from 'inversify-express-utils';
+import { controller, httpDelete, httpPost, httpGet } from 'inversify-express-utils';
 
 /**
  * UserController
@@ -32,6 +32,15 @@ export class UserController {
     const result = await this.userService.create({ email, login, password, tenant: req.tenant.id, scope, sub });
 
     res.json(result);
+  }
+
+
+  @httpGet(
+    '/',
+  )
+  async listUsers(req: AuthorizedRequest, res: Response): Promise<void> {
+    const result = await this.userService.listForTenant(req.tenant.id);
+    res.status(200).send(result);
   }
 
   /**
