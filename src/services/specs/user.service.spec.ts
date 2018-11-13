@@ -20,18 +20,26 @@ describe('userService', () => {
   });
 
   describe('#listForTenant', () => {
+
     before(async() => {
       const userOne = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123' };
       const userTwo = { email: 'test1', login: 'test1', tenant: 'test', password: 'test', sub: '321' };
       await userService.create(userOne);
       await userService.create(userTwo);
     });
-    
+
     it('should list users by tenant id', async() => {
       const result = await userService.listForTenant('test');
       expect(result).to.be.an('array');
       expect(result.length).to.equal(2);
     });
+
+    it('should return empty list of users if tenant has no users', async() => {
+      const result = await userService.listForTenant('test2');
+      expect(result).to.be.an('array');
+      expect(result.length).to.equal(0);
+    });
+    
   });
 
   describe('#get', () => {
