@@ -13,10 +13,10 @@ export function createUser(req: Request, res: Response, next: NextFunction) {
     sub: Joi.string().required()
   });
 
-  const result = Joi.validate(req.body, schema, options);
+  let result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json(result);
+    return res.status(422).json({...result, message: 'Validation error'});
   } else {
     return next();
   }
@@ -31,7 +31,7 @@ export function createTenant(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json(result);
+    return res.status(422).json({...result, message: 'Validation error'});
   } else {
     return next();
   }
@@ -46,7 +46,7 @@ export function loginTenant(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json(result);
+    return res.status(422).json({...result, message: 'Validation error'});
   } else {
     return next();
   }
@@ -62,7 +62,7 @@ export function createToken(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json(result);
+    return res.status(422).json({...result, message: 'Validation error'});
   } else {
     return next();
   }
@@ -76,7 +76,7 @@ export function tokenRequired(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json(result);
+    return res.status(422).json({...result, message: 'Validation error'});
   } else {
     return next();
   }
