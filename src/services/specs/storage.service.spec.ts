@@ -36,10 +36,11 @@ describe('storageService', () => {
     beforeEach(async() => {
       await storageService.set('key1', 'value1');
       await storageService.set('key2', 'value2');
+      console.log();
     });
 
     it('should return value', async() => {
-      const value = await storageService.mget(['key1', 'key2']);
+      const value = await storageService.mget(['jincor_auth_key1', 'jincor_auth_key2']);
       expect(value).to.be.an('array');
       expect(value.length).to.equal(2);
       expect(value[0]).to.equal('value1');
@@ -48,7 +49,7 @@ describe('storageService', () => {
 
     it('should return empty array', async() => {
       const value = await storageService.mget(['wrongKey']);
-      expect(value.length).to.equal(0);
+      expect(value[0]).to.equal(null);
     });
   });
 
@@ -59,7 +60,7 @@ describe('storageService', () => {
     });
 
     it('should return array of keys', async() => {
-      const value = await storageService.keys('key*');
+      const value = await storageService.keys('*key*');
       expect(value).to.be.an('array');
       expect(value.length).to.equal(2);
     });

@@ -15,7 +15,6 @@ describe('userService', () => {
     it('should create new user', async() => {
       const user = { email: 'test', login: 'test', tenant: 'test', password: 'test', sub: '123' };
       const result = await userService.create(user);
-
       expect(result).to.be.a('object');
     });
   });
