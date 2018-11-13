@@ -76,7 +76,7 @@ export function tokenRequired(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json({...result, message: 'Validation error'});
+    return res.status(422).json({...result, message: 'Token is missing'});
   } else {
     return next();
   }
