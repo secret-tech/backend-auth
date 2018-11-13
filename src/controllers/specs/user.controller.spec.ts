@@ -130,7 +130,7 @@ describe('Users', () => {
       };
     });
 
-    it('should list users for tenant', async (done) => {
+    it('should list users for tenant', (done) => {
       const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test', sub: '123' };
       const params2 = { email: 'test2', login: 'test2', tenant: tenant.id, password: 'test2', sub: '321' };
       userService.create(params).then(() => {
