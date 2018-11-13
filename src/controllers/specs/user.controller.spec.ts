@@ -131,24 +131,30 @@ describe('Users', () => {
           .set('Authorization', 'Bearer ' + token);
       };
     });
-
-    it('should list users for tenant', (done) => {
+    /**
+     * Issue-62
+     * @see https://github.com/secret-tech/backend-auth/issues/62
+     */
+    it('should show empty list of tenants if tenant doest exist', (done) => {
       getRequest('/user').end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.body.length).to.equal(0);
         done();
       });
-      // const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test', sub: '123' };
-      // const params2 = { email: 'test2', login: 'test2', tenant: tenant.id, password: 'test2', sub: '321' };
-      // userService.create(params).then(() => {
-      //   userService.create(params2).then(() => {
-      //     getRequest('/user').end((err, res) => {
-      //       expect(res.status).to.equal(200);
-      //       expect(res.body.length).to.equal(2);
-      //       done();
-      //     });
-      //   });
-      // });
+    });
+
+    it('should list users for tenant', (done) => {
+      const params = { email: 'test', login: 'test', tenant: tenant.id, password: 'test', sub: '123' };
+      const params2 = { email: 'test2', login: 'test2', tenant: tenant.id, password: 'test2', sub: '321' };
+      userService.create(params).then(() => {
+        userService.create(params2).then(() => {
+          getRequest('/user').end((err, res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body.length).to.equal(2);
+            done();
+          });
+        });
+      });
     });
 
 
