@@ -7,7 +7,7 @@ import config from '../config';
 import { any } from 'joi';
 import { rejects } from 'assert';
 
-const {redis: {url, prefix}} = config;
+const { redis: { url, prefix } } = config;
 
 export interface StorageService {
   client: RedisClient;
@@ -17,7 +17,8 @@ export interface StorageService {
   expire: (key: string, time: number) => Promise<any>;
   del: (key: string) => Promise<any>;
   keys: (key: string) => Promise<any>;
-  mget: (keys: string[]) =>  Promise<any>;
+  mget: (keys: string[]) => Promise<any>;
+  scan: (cursor: string, tenantId: string) => Promise<any>;
 }
 
 @injectable()
@@ -69,8 +70,14 @@ export class RedisService implements StorageService {
   }
 
   mget(keys: string[]): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
       this.client.mget(keys, (err, result) => err ? reject(err) : resolve(result));
+    });
+  }
+
+  scan(cursor: string, pattern: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.client.scan([cursor, 'match', pattern], (err, result) => err ? reject(err) : resolve(result));
     });
   }
 }

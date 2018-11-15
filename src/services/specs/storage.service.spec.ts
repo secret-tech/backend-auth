@@ -103,4 +103,17 @@ describe('storageService', () => {
       expect(result).to.equal(0);
     });
   });
+
+  describe('#scan', () => {
+    beforeEach(async() => {
+      await storageService.flushdb();
+      await storageService.set('key1', 'value');
+      await storageService.set('key2', 'value');
+    });
+
+    it('should find 2 keys and return 0 cursor', async() => {
+      const result = await storageService.scan('0', 'key*');
+      expect(result[0]).to.equal('0');
+    });
+  });
 });

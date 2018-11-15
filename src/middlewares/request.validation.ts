@@ -62,7 +62,21 @@ export function createToken(req: Request, res: Response, next: NextFunction) {
   const result = Joi.validate(req.body, schema, options);
 
   if (result.error) {
-    return res.status(422).json({...result, message: 'Validation error'});
+    return res.status(422).json({ ...result, message: 'Validation error' });
+  } else {
+    return next();
+  }
+}
+
+export function listUsers(req: Request, res: Response, next: NextFunction) {
+  const schema = Joi.object().keys({
+    q: Joi.string().min(3).max(120),
+    cursor: Joi.string().min(1).max(12)
+  });
+
+  const result = Joi.validate(req.query, schema, options);
+  if (result.error) {
+    return res.status(422).json({ ...result, message: 'Request validation error. Try to change your request' });
   } else {
     return next();
   }
