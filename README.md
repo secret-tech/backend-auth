@@ -1,7 +1,6 @@
 # >_ secret_tech Auth service
-[ ![Codeship Status for JincorTech/backend-auth](https://app.codeship.com/projects/424d2bc0-a750-0135-bed6-1e9510c95f82/status?branch=master)](https://app.codeship.com/projects/255790)
 
-For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth)
 
 ## Why
 There are a lot of authentication services. But we were looking for a containerized simple to use solution
@@ -36,7 +35,7 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 
 
 ## API Endpoints
-For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
+For more information, see [API Documentation](https://secret-tech.github.io/backend-auth)
 
 1. `/tenant` POST - register a tenant.
 1. `/tenant/login` POST - login a tenant.
