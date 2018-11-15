@@ -81,7 +81,7 @@ export class UserService implements UserServiceInterface {
     if (keys.length <= 1) {
       return { users: [], nextCursor: '0' };
     }
-    const nextCursor = keys.splice(0, 1);
+    const nextCursor = keys.splice(0, 1)[0];
     if (!keys[0] || keys[0].length === 0) {
       return { users: [], nextCursor };
     }

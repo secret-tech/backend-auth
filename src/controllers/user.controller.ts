@@ -43,6 +43,7 @@ export class UserController {
     if (req.query.q) {
       const query = req.tenant.id + ':' + req.query.q;
       const result = await this.userService.get(query);
+      console.log('Res: ', result);
       res.status(200).send(result);
     } else {
       const cursor: string = req.query.cursor ? req.query.cursor : '0';
