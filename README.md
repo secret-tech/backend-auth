@@ -24,7 +24,6 @@ that no one can validate token without making a call to Auth service because the
 secret key and random session id known only by Auth service.
 This session mechanism is also used to invalidate tokens. Removing session key from the database will do the trick.
 
-
 ## Common workflow is following:
 
 1. Create a user.
@@ -32,7 +31,6 @@ This session mechanism is also used to invalidate tokens. Removing session key f
 3. Verify saved token whenever authentication required.
 4. Logout the user when necessary.
 5. Delete the user when his account is not active anymore or deleted.
-
 
 ## API Endpoints
 For more information, see [API Documentation](https://secret-tech.github.io/backend-auth)
