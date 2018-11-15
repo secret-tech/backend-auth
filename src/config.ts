@@ -13,6 +13,7 @@ const {
   THROTTLER_INTERVAL,
   THROTTLER_MAX,
   THROTTLER_MIN_DIFF,
+  JWT_KEY_EXP,
   JWT_KEY,
   TENANT_WHITE_LIST,
   MAINTAIN_TLS_PORT,
@@ -31,7 +32,7 @@ export default {
   jwt: {
     algorithm: 'HS256',
     secretSeparator: ':',
-    expiration: 604800,
+    expiration: parseInt(JWT_KEY_EXP) || 604800,
     secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
   },
   redis: {
