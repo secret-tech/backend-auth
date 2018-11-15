@@ -44,7 +44,7 @@ export class UserController {
       const query = req.tenant.id + ':' + req.query.q;
       const result = await this.userService.get(query);
       if (result === null) res.status(200).send({ users: [] });
-      else res.status(200).send({ users: JSON.parse(result) });
+      else res.status(200).send({ users: [JSON.parse(result)] });
     } else {
       const cursor: string = req.query.cursor ? req.query.cursor : '0';
       const result = await this.userService.listForTenant(req.tenant.id, cursor);
