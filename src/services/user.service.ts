@@ -15,7 +15,7 @@ type UserData = {
 
 export interface UserServiceInterface {
   get: (key: string) => Promise<string>;
-  listForTenant: (tenantId: String) => Promise<any>;
+  listForTenant: (tenantId: string, cursor: string) => Promise<any>;
   create: (userData: UserData) => Promise<any>;
   del: (key: string) => Promise<any>;
   getKey: (tenant: string, login: string) => string;
@@ -72,23 +72,28 @@ export class UserService implements UserServiceInterface {
 
   /**
    * List users for specified tenant
-   * 
+   * @TODO: add test
    * @param tenantId string with id of tenant to list users for
    * @return Promise
    */
-  async listForTenant(tenantId: String): Promise<any> {
-    const keys = await this.storageService.keys('*' + tenantId + ':*');
-    if (keys.length === 0) {
-      return [];
+  async listForTenant(tenantId: string, cursor: string): Promise<any> {
+    const keys: Array<any> = await this.storageService.scan(cursor, '*' + tenantId + ':*');
+    if (keys.length <= 1) {
+      return { users: [], nextCursor: '0' };
     }
-    const rawUsers = await this.storageService.mget(keys);
+    const nextCursor = keys.splice(0, 1);
+    if (!keys[0] || keys[0].length === 0) {
+      return { users: [], nextCursor };
+    }
+    const rawUsers = await this.storageService.mget(keys[0]);
+    if (rawUsers[0] == null) return { users: [], nextCursor };
     const parsedUsers = rawUsers.map((user) => {
       const modifiedUser: UserData = JSON.parse(user);
       delete modifiedUser.password;
       delete modifiedUser.tenant;
       return modifiedUser;
     });
-    return parsedUsers;
+    return { users: parsedUsers, nextCursor };
   }
 
   /**

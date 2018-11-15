@@ -138,7 +138,8 @@ describe('Users', () => {
     it('should show empty list of tenants if tenant doest exist', (done) => {
       getRequest('/user').end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.body.length).to.equal(0);
+        expect(res.body.users).to.be.an('array');
+        expect(res.body.users.length).to.equal(0);
         done();
       });
     });
@@ -150,15 +151,13 @@ describe('Users', () => {
         userService.create(params2).then(() => {
           getRequest('/user').end((err, res) => {
             expect(res.status).to.equal(200);
-            expect(res.body.length).to.equal(2);
+            expect(res.body.users.length).to.equal(2);
             done();
           });
         });
       });
     });
 
-
-    
   });
 
   describe('DELETE /user', () => {

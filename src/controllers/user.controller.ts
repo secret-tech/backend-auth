@@ -34,13 +34,21 @@ export class UserController {
     res.json(result);
   }
 
-
+  // @TODO: add request validation for security reason
   @httpGet(
     '/',
+    'ListUsersValidation'
   )
   async listUsers(req: AuthorizedRequest, res: Response): Promise<void> {
-    const result = await this.userService.listForTenant(req.tenant.id);
-    res.status(200).send(result);
+    if (req.query.q) {
+      const query = req.tenant.id + ':' + req.query.q;
+      const result = await this.userService.get(query);
+      res.status(200).send(result);
+    } else {
+      const cursor: string = req.query.cursor ? req.query.cursor : '0';
+      const result = await this.userService.listForTenant(req.tenant.id, cursor);
+      res.status(200).send(result);
+    }
   }
 
   /**
