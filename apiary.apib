@@ -76,7 +76,7 @@ Common workflow is following:
 + Request (application/json)
 
         {
-            "accessToken": "jwt_token"
+            "token": "jwt_token"
         }
 
 + Response 200 (application/json)
@@ -151,10 +151,10 @@ or an object describing what operations user can perform with resources (e.g. {
 + Request (application/json)
 
         {
-            "email": "test@test.com",
-            "login": "testuser",
-            "password": "password",
-            "scope": "user_scope"
+            "login": "test_gmail.com",
+            "email": "test@gmail.com",
+            "password": "passw0Rd",
+            "sub": "test"
         }
 
 + Response 200 (application/json)
@@ -163,8 +163,69 @@ or an object describing what operations user can perform with resources (e.g. {
             "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
             "login": "testuser",
             "email": "test@test.com",
+            "tenant": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
             "scope": "user_scope"
         }
+
+
+
+## List users [/user{?q}{?cursor}]
+
+In case pagination requested the first value in response is always `cursor`. If you need to load the next page, provide cursor 
+in the next request parameter to load the next page. "0" is always for the first page if you see "0" in respone - there is no
+next page. It doesnt apply if  you search for users. Pagination for search requests is not supported
+
+###  List users for tenant [GET]
+
++ Parameters
+
+    + q (string, optional)
+      query string to search users by login
+    + cursor (string, optional)
+      cursor for pagination
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+                "login": "testuser",
+                "email": "test@test.com",
+                "scope": "advisor",
+                "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
+                "sub": "facebookId"
+            },
+            {
+                "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+                "login": "testuser",
+                "email": "test@test.com",
+                "scope": "advisor",
+                "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
+                "sub": "facebookId"
+            }
+        ]
+
++ Response 200 (application/json)
+
+        [
+            "0",
+            {
+                "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+                "login": "testuser",
+                "email": "test@test.com",
+                "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
+                "scope": "advisor",
+                "sub": "facebookId"
+            },
+            {
+                "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
+                "login": "testuser",
+                "email": "test@test.com",
+                "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
+                "scope": "advisor",
+                "sub": "facebookId"
+            }
+        ]
 
 ## Delete user [/user/{login}]
 
