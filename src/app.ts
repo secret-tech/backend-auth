@@ -21,15 +21,24 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000');
   }
 
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'deny');
+    res.setHeader('Content-Security-Policy', 'default-src \'none\'');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept');
+
+    if ('OPTIONS' === req.method) {
+      //respond with 200
+      return res.sendStatus(200);
+    }
+
   if (req.header('Accept') !== 'application/json') {
     return res.status(406).json({
       error: 'Unsupported "Accept" header'
     });
   }
 
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'deny');
-  res.setHeader('Content-Security-Policy', 'default-src \'none\'');
   return next();
 });
 

@@ -1,4 +1,4 @@
-# Jincor Auth
+# >_ secret_tech Auth service
 [ ![Codeship Status for JincorTech/backend-auth](https://app.codeship.com/projects/424d2bc0-a750-0135-bed6-1e9510c95f82/status?branch=master)](https://app.codeship.com/projects/255790)
 
 For more information, see [API Documentation](https://secret-tech.github.io/backend-auth/index.html)
