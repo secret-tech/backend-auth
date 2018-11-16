@@ -112,8 +112,9 @@ describe('storageService', () => {
     });
 
     it('should find 2 keys and return 0 cursor', async() => {
-      const result = await storageService.scan('0', 'key*');
+      const result = await storageService.scan('0', '*key*');
       expect(result[0]).to.equal('0');
+      expect(result[1].length).to.equal(2);
     });
   });
 });

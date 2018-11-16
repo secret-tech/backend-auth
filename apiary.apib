@@ -44,6 +44,7 @@ Common workflow is following:
         {
             "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
             "email": "test@test.com",
+            "token": "jwt_token"
         }
 
 ## Login tenant to create new JWT token [/tenant/login]
@@ -64,7 +65,7 @@ Common workflow is following:
 + Response 200 (application/json)
 
         {
-            "accessToken": "jwt_token"
+            "token": "jwt_token"
         }
 
 ## Logout tenant to invalidate JWT token [/tenant/logout]
@@ -164,7 +165,9 @@ or an object describing what operations user can perform with resources (e.g. {
             "login": "testuser",
             "email": "test@test.com",
             "tenant": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
-            "scope": "user_scope"
+            "scope": "user_scope",
+            "registrationDate": 1542384291572,
+            "lastActivity": 1542384471740
         }
 
 
@@ -193,7 +196,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
                 "email": "test@test.com",
                 "scope": "advisor",
                 "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
-                "sub": "facebookId"
+                "sub": "facebookId",
+                "registrationDate": 1542384291572,
+                "lastActivity": 1542384471740
             },
             {
                 "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
@@ -201,7 +206,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
                 "email": "test@test.com",
                 "scope": "advisor",
                 "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
-                "sub": "facebookId"
+                "sub": "facebookId",
+                "registrationDate": 1542384291572,
+                "lastActivity": 1542384471740
             }
         ]
 
@@ -215,7 +222,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
                 "email": "test@test.com",
                 "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
                 "scope": "advisor",
-                "sub": "facebookId"
+                "sub": "facebookId",
+                "registrationDate": 1542384291572,
+                "lastActivity": 1542384471740
             },
             {
                 "id": "0107bfcf-2f42-4e83-99e9-3ba44b737302",
@@ -223,7 +232,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
                 "email": "test@test.com",
                 "tenant": "c3a1e8d6-c361-4d55-8f26-e5134d804556",
                 "scope": "advisor",
-                "sub": "facebookId"
+                "sub": "facebookId",
+                "registrationDate": 1542384291572,
+                "lastActivity": 1542384471740
             }
         ]
 
