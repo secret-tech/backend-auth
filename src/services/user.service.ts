@@ -19,6 +19,7 @@ export interface UserServiceInterface {
   create: (userData: UserData) => Promise<any>;
   del: (key: string) => Promise<any>;
   getKey: (tenant: string, login: string) => string;
+  updateLastActivity: (tenant: string, login: string) => Promise<boolean>;
 }
 
 /**
@@ -53,21 +54,34 @@ export class UserService implements UserServiceInterface {
    */
   async create(userData: UserData): Promise<any> {
     const { email, tenant, login, password: passwordHash, scope, sub } = userData;
-
-    const password: string = bcrypt.hashSync(passwordHash);
+    const password: string = passwordHash.length === 60 ? passwordHash : bcrypt.hashSync(passwordHash);
     const key: string = this.getKey(tenant, login);
+    const registrationDate = Date.now();
     const data: any = {
       id: uuid.v4(),
       login,
       password,
       email,
       tenant,
+      registrationDate,
+      lastActivity: registrationDate,
       scope,
       sub
     };
     await this.storageService.set(key, JSON.stringify(data));
     delete data.password;
     return data;
+  }
+
+  async updateLastActivity(tenant: string, login: string): Promise<boolean> {
+    const key: string = this.getKey(tenant, login);
+    let user = JSON.parse(await this.storageService.get(key));
+    if (!user) {
+      return false;
+    }
+    user.lastActivity = Date.now();
+    await this.storageService.set(key, JSON.stringify(user));
+    return true;
   }
 
   /**

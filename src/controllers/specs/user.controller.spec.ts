@@ -152,7 +152,19 @@ describe('Users', () => {
           getRequest('/user').end((err, res) => {
             expect(res.status).to.equal(200);
             expect(res.body.users.length).to.equal(2);
-            done();
+            const user = res.body.users[0];
+            expect(user).to.have.property('registrationDate');
+            expect(user).to.have.property('lastActivity');
+            expect(user).to.have.property('id');
+            getRequest('/user?q=test2').end((err, res) => {
+              expect(res.status).to.equal(200);
+              expect(res.body.users.length).to.equal(1);
+              getRequest('/user?cursor=0').end((err, res) => {
+                expect(res.status).to.equal(200);
+                expect(res.body).to.have.property('nextCursor');
+                done();
+              });
+            });
           });
         });
       });

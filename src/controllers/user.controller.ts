@@ -34,7 +34,6 @@ export class UserController {
     res.json(result);
   }
 
-  // @TODO: add request validation for security reason
   @httpGet(
     '/',
     'ListUsersValidation'

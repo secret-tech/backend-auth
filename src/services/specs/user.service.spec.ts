@@ -32,7 +32,7 @@ describe('userService', () => {
 
     it('should return empty list of users if tenant has no users', async() => {
       const result = await userService.listForTenant('test2', '0');
-      expect(result).to.deep.equal({ users: [], nextCursor: [ '0' ] });
+      expect(result).to.deep.equal({ users: [], nextCursor: '0' });
     });
   });
 

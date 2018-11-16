@@ -52,9 +52,10 @@
   "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
   "<span class="hljs-attribute">password</span>": <span class="hljs-value"><span class="hljs-string">"passwordA6"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"0107bfcf-2f42-4e83-99e9-3ba44b737302"</span></span>,
-    "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
-}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="tenant-login-tenant-to-create-new-jwt-token" class="resource"><h3 class="resource-heading">Login tenant to create new JWT token <a href="#tenant-login-tenant-to-create-new-jwt-token" class="permalink">&nbsp;&para;</a></h3><div id="tenant-login-tenant-to-create-new-jwt-token-post" class="action post"><h4 class="action-heading"><div class="name">Login tenant</div><a href="#tenant-login-tenant-to-create-new-jwt-token-post" class="method post">POST</a><code class="uri">/tenant/login</code></h4><ul>
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"0107bfcf-2f42-4e83-99e9-3ba44b737302"</span></span>,
+  "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
+  "<span class="hljs-attribute">token</span>": <span class="hljs-value"><span class="hljs-string">"jwt_token"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="tenant-login-tenant-to-create-new-jwt-token" class="resource"><h3 class="resource-heading">Login tenant to create new JWT token <a href="#tenant-login-tenant-to-create-new-jwt-token" class="permalink">&nbsp;&para;</a></h3><div id="tenant-login-tenant-to-create-new-jwt-token-post" class="action post"><h4 class="action-heading"><div class="name">Login tenant</div><a href="#tenant-login-tenant-to-create-new-jwt-token-post" class="method post">POST</a><code class="uri">/tenant/login</code></h4><ul>
 <li>
 <p>email <code>test@test.com</code> (string, required, email)</p>
 </li>
@@ -66,7 +67,7 @@
   "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
   "<span class="hljs-attribute">password</span>": <span class="hljs-value"><span class="hljs-string">"password"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">accessToken</span>": <span class="hljs-value"><span class="hljs-string">"jwt_token"</span>
+  "<span class="hljs-attribute">token</span>": <span class="hljs-value"><span class="hljs-string">"jwt_token"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="tenant-logout-tenant-to-invalidate-jwt-token" class="resource"><h3 class="resource-heading">Logout tenant to invalidate JWT token <a href="#tenant-logout-tenant-to-invalidate-jwt-token" class="permalink">&nbsp;&para;</a></h3><div id="tenant-logout-tenant-to-invalidate-jwt-token-post" class="action post"><h4 class="action-heading"><div class="name">Logout tenant</div><a href="#tenant-logout-tenant-to-invalidate-jwt-token-post" class="method post">POST</a><code class="uri">/tenant/logout</code></h4><ul>
 <li>accessToken <code>jwt</code> (string, required)</li>
 </ul>
@@ -131,7 +132,9 @@ or an object describing what operations user can perform with resources (e.g. {
   "<span class="hljs-attribute">login</span>": <span class="hljs-value"><span class="hljs-string">"testuser"</span></span>,
   "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
   "<span class="hljs-attribute">tenant</span>": <span class="hljs-value"><span class="hljs-string">"0107bfcf-2f42-4e83-99e9-3ba44b737302"</span></span>,
-  "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"user_scope"</span>
+  "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"user_scope"</span></span>,
+  "<span class="hljs-attribute">registrationDate</span>": <span class="hljs-value"><span class="hljs-number">1542384291572</span></span>,
+  "<span class="hljs-attribute">lastActivity</span>": <span class="hljs-value"><span class="hljs-number">1542384471740</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="user-list-users" class="resource"><h3 class="resource-heading">List users <a href="#user-list-users" class="permalink">&nbsp;&para;</a></h3><p>In case pagination requested the first value in response is always <code>cursor</code>. If you need to load the next page, provide cursor
 in the next request parameter to load the next page. “0” is always for the first page if you see “0” in respone - there is no
 next page. It doesnt apply if  you search for users. Pagination for search requests is not supported</p>
@@ -144,7 +147,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
     "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
     "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"advisor"</span></span>,
     "<span class="hljs-attribute">tenant</span>": <span class="hljs-value"><span class="hljs-string">"c3a1e8d6-c361-4d55-8f26-e5134d804556"</span></span>,
-    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span>
+    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span></span>,
+    "<span class="hljs-attribute">registrationDate</span>": <span class="hljs-value"><span class="hljs-number">1542384291572</span></span>,
+    "<span class="hljs-attribute">lastActivity</span>": <span class="hljs-value"><span class="hljs-number">1542384471740</span>
   </span>},
   {
     "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"0107bfcf-2f42-4e83-99e9-3ba44b737302"</span></span>,
@@ -152,7 +157,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
     "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
     "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"advisor"</span></span>,
     "<span class="hljs-attribute">tenant</span>": <span class="hljs-value"><span class="hljs-string">"c3a1e8d6-c361-4d55-8f26-e5134d804556"</span></span>,
-    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span>
+    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span></span>,
+    "<span class="hljs-attribute">registrationDate</span>": <span class="hljs-value"><span class="hljs-number">1542384291572</span></span>,
+    "<span class="hljs-attribute">lastActivity</span>": <span class="hljs-value"><span class="hljs-number">1542384471740</span>
   </span>}
 ]</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>[
   <span class="hljs-string">"0"</span>,
@@ -162,7 +169,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
     "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
     "<span class="hljs-attribute">tenant</span>": <span class="hljs-value"><span class="hljs-string">"c3a1e8d6-c361-4d55-8f26-e5134d804556"</span></span>,
     "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"advisor"</span></span>,
-    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span>
+    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span></span>,
+    "<span class="hljs-attribute">registrationDate</span>": <span class="hljs-value"><span class="hljs-number">1542384291572</span></span>,
+    "<span class="hljs-attribute">lastActivity</span>": <span class="hljs-value"><span class="hljs-number">1542384471740</span>
   </span>},
   {
     "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"0107bfcf-2f42-4e83-99e9-3ba44b737302"</span></span>,
@@ -170,7 +179,9 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
     "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"test@test.com"</span></span>,
     "<span class="hljs-attribute">tenant</span>": <span class="hljs-value"><span class="hljs-string">"c3a1e8d6-c361-4d55-8f26-e5134d804556"</span></span>,
     "<span class="hljs-attribute">scope</span>": <span class="hljs-value"><span class="hljs-string">"advisor"</span></span>,
-    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span>
+    "<span class="hljs-attribute">sub</span>": <span class="hljs-value"><span class="hljs-string">"facebookId"</span></span>,
+    "<span class="hljs-attribute">registrationDate</span>": <span class="hljs-value"><span class="hljs-number">1542384291572</span></span>,
+    "<span class="hljs-attribute">lastActivity</span>": <span class="hljs-value"><span class="hljs-number">1542384471740</span>
   </span>}
 ]</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="user-delete-user" class="resource"><h3 class="resource-heading">Delete user <a href="#user-delete-user" class="permalink">&nbsp;&para;</a></h3><div id="user-delete-user-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a user</div><a href="#user-delete-user-delete" class="method delete">DELETE</a><code class="uri">/user/</code></h4><h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname">http://auth:3000/</span>/user/</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">result</span>": <span class="hljs-value"><span class="hljs-number">1</span>
@@ -250,7 +261,7 @@ next page. It doesnt apply if  you search for users. Pagination for search reque
   "<span class="hljs-attribute">result</span>": <span class="hljs-value"><span class="hljs-number">1</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">error</span>": <span class="hljs-value"><span class="hljs-string">"invalid token"</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 15 Nov 2018</p><script>/* eslint-env browser */
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 16 Nov 2018</p><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 
