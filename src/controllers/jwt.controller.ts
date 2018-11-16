@@ -56,9 +56,8 @@ export class JWTController {
         });
         return;
       }
-
       const token = await this.keyService.set(user, deviceId);
-
+      this.userService.updateLastActivity(req.tenant.id, login);
       res.status(200).send({
         accessToken: token
       });
@@ -87,6 +86,7 @@ export class JWTController {
       });
       return;
     }
+    this.userService.updateLastActivity(req.tenant.id, decoded.login);
 
     res.send({ decoded });
   }

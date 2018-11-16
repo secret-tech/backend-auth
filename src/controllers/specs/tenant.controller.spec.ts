@@ -112,7 +112,7 @@ describe('Tenants', () => {
       tenantService.create(tenant).then(() => {
         request(app).post('/tenant/login').set('Accept', 'application/json').send(tenant).end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('accessToken');
+          expect(res.body).to.have.property('token');
           done();
         });
       });
