@@ -77,7 +77,7 @@ export class RedisService implements StorageService {
 
   scan(cursor: string, pattern: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.client.scan([cursor, 'match', pattern], (err, result) => err ? reject(err) : resolve(result));
+      this.client.scan([cursor, 'match', pattern, 'count', config.redis.pageLength], (err, result) => err ? reject(err) : resolve(result));
     });
   }
 }

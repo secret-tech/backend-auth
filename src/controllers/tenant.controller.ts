@@ -29,7 +29,8 @@ export class TenantController {
     const { email, password } = req.body;
 
     try {
-      const result = await this.tenantService.create({ email, password });
+      let result = await this.tenantService.create({ email, password });
+      result.token = await this.tenantService.login({ email, password });
       res.json(result);
     } catch (e) {
       res.status(400).json({
@@ -60,7 +61,7 @@ export class TenantController {
     }
 
     token
-      ? res.status(200).send({ accessToken: token })
+      ? res.status(200).send({ token })
       : res.status(500).send({ error });
   }
 
