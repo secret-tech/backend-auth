@@ -39,7 +39,7 @@ export default {
   redis: {
     url: REDIS_URL || 'redis://redis:6379',
     prefix: 'auth_',
-    pageLength: parseInt(REDIS_PAGE_LENGTH, 10) || 100
+    pageLength: REDIS_PAGE_LENGTH || '100'
   },
   throttler: {
     prefix: 'request_throttler_',
