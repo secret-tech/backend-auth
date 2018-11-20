@@ -5,6 +5,7 @@ dotenv.config();
 const {
   REDIS_URL,
   REDIS_PASSWORD,
+  REDIS_PAGE_LENGTH,
   PORT,
   HTTPS_PORT,
   HTTPS_SERVER,
@@ -32,12 +33,13 @@ export default {
   jwt: {
     algorithm: 'HS256',
     secretSeparator: ':',
-    expiration: parseInt(JWT_KEY_EXP) || 604800,
+    expiration: parseInt(JWT_KEY_EXP, 10) || 604800,
     secret: JWT_KEY || 'uZrJ!xe*xN?!;oU.u*;QOSM+|=4C?WH?6eWPcK/6AkIXIVGQguSA*r'
   },
   redis: {
     url: REDIS_URL || 'redis://redis:6379',
-    prefix: 'jincor_auth_'
+    prefix: 'auth_',
+    pageLength: parseInt(REDIS_PAGE_LENGTH, 10) || 100
   },
   throttler: {
     prefix: 'request_throttler_',
