@@ -20,7 +20,10 @@ const {
   MAINTAIN_TLS_PORT,
   MAINTAIN_TLS_PEM,
   MAINTAIN_TLS_CA,
-  MAINTAIN_TLS_CA_CN
+  MAINTAIN_TLS_CA_CN,
+
+  VK_ID,
+  VK_SECRET
 } = process.env;
 
 export default {
@@ -54,5 +57,9 @@ export default {
     maintainTlsPem: MAINTAIN_TLS_PEM || '',
     maintainTlsCa: MAINTAIN_TLS_CA || '',
     maintainTlsCaCn: MAINTAIN_TLS_CA_CN || 'Auth Maintain'
+  },
+  vk: {
+    id: VK_ID || '',
+    secret: VK_SECRET || ''
   }
 };

@@ -28,7 +28,8 @@
     "node-uuid": "^1.4.7",
     "redis": "2.8.0",
     "reflect-metadata": "0.1.12",
-    "rolling-rate-limiter": "0.1.11"
+    "rolling-rate-limiter": "0.1.11",
+    "web-request": "1.0.7"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "0.0.30",
