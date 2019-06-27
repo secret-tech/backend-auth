@@ -23,7 +23,9 @@ const {
   MAINTAIN_TLS_CA_CN,
 
   VK_ID,
-  VK_SECRET
+  VK_SECRET,
+  FB_ID,
+  FB_SECRET
 } = process.env;
 
 export default {
@@ -61,5 +63,9 @@ export default {
   vk: {
     id: VK_ID || '',
     secret: VK_SECRET || ''
+  },
+  fb: {
+    id: FB_ID || '',
+    secret: FB_SECRET || ''
   }
 };
