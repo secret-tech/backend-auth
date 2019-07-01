@@ -20,7 +20,12 @@ const {
   MAINTAIN_TLS_PORT,
   MAINTAIN_TLS_PEM,
   MAINTAIN_TLS_CA,
-  MAINTAIN_TLS_CA_CN
+  MAINTAIN_TLS_CA_CN,
+
+  VK_ID,
+  VK_SECRET,
+  FB_ID,
+  FB_SECRET
 } = process.env;
 
 export default {
@@ -39,7 +44,7 @@ export default {
   redis: {
     url: REDIS_URL || 'redis://redis:6379',
     prefix: 'auth_',
-    pageLength: parseInt(REDIS_PAGE_LENGTH, 10) || 100
+    pageLength: REDIS_PAGE_LENGTH || '100'
   },
   throttler: {
     prefix: 'request_throttler_',
@@ -54,5 +59,13 @@ export default {
     maintainTlsPem: MAINTAIN_TLS_PEM || '',
     maintainTlsCa: MAINTAIN_TLS_CA || '',
     maintainTlsCaCn: MAINTAIN_TLS_CA_CN || 'Auth Maintain'
+  },
+  vk: {
+    id: VK_ID || '',
+    secret: VK_SECRET || ''
+  },
+  fb: {
+    id: FB_ID || '',
+    secret: FB_SECRET || ''
   }
 };
