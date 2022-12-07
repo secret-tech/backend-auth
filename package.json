@@ -20,7 +20,7 @@
     "body-parser": "1.18.3",
     "debug": "3.1.0",
     "dotenv": "6.0.0",
-    "express": "4.16.3",
+    "express": "4.17.3",
     "inversify": "4.13.0",
     "inversify-express-utils": "6.0.0",
     "joi": "13.4.0",
