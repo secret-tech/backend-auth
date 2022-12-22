@@ -24,7 +24,7 @@
     "inversify": "4.13.0",
     "inversify-express-utils": "6.0.0",
     "joi": "13.4.0",
-    "jsonwebtoken": "8.3.0",
+    "jsonwebtoken": "9.0.0",
     "node-uuid": "^1.4.7",
     "redis": "2.8.0",
     "reflect-metadata": "0.1.12",
